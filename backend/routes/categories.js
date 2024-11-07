@@ -99,8 +99,7 @@ router.put("/:id", async (req, res) => {
   const imagesToUpload = req.body.images.map((image) => {
     return limit(async () => {
       const result = await cloudinary.uploader.upload(image);
-      // console.log(`successfully uploaded $(image)`);
-      // console.log(`>result:$(result.secure_url)`);
+
       return result;
     });
   });

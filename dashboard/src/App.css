@@ -11,12 +11,14 @@ body {
 header {
   width: 100%;
   height: 87px;
-  background-color: #ffffff;
+  background: rgba(255, 255, 255, 0.7);
   padding-top: 7px;
   position: fixed;
   top: 0px;
   left: 0px;
   z-index: 1000;
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
 }
 ::-webkit-scrollbar {
   width: 5px !important;
@@ -32,6 +34,18 @@ header {
 
 header .row {
   margin: 0 !important;
+}
+.main-header {
+  width: 100%;
+  height: 87px;
+  background: rgba(255, 255, 255, 0.7) !important;
+  padding-top: 7px;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  z-index: 1000;
+  -webkit-backdrop-filter: blur(5px) !important;
+  backdrop-filter: blur(5px) !important;
 }
 .main-header .logo-img {
   width: 70px;
@@ -62,6 +76,9 @@ header .row {
 .main-header button.rounded-circle:hover svg {
   color: #0858f7;
   font-size: 22px !important;
+}
+.main-header .part3 {
+  padding-left: 100px;
 }
 .search {
   width: 350px;
@@ -277,6 +294,7 @@ header .row {
 body {
   font-family: "Open Sans", sans-serif;
   background: #e9e8e8;
+  overflow-x: hidden;
 }
 header {
   width: 100%;
@@ -347,7 +365,11 @@ header .row {
 .main .sidebarWrapper {
   width: 20%;
   flex: 0 0 20%;
-  transition: all 0.3s ease-in-out;
+  transition: all 0.3s;
+}
+.main .sidebarWrapper.toggle {
+  width: 0%;
+  flex: 0 0 0%;
 }
 .main .sidebarWrapper .sidebar {
   width: 20%;
@@ -360,6 +382,10 @@ header .row {
   overflow-y: scroll;
   overflow-x: hidden;
   padding-bottom: 40px;
+  transition: all 0.3s;
+}
+.main .sidebarWrapper.toggle .sidebar {
+  left: -100%;
 }
 .main .sidebarWrapper .sidebar::-webkit-scrollbar {
   width: 3px !important;
@@ -422,7 +448,7 @@ header .row {
 .main .sidebarWrapper .sidebar ul .submenu {
   padding: 0px 45px;
   position: relative;
-  transition: all 0.3s;
+  transition: all 0.4s;
   height: 0px;
 }
 .main .sidebarWrapper .sidebar ul .submenu .active {
@@ -523,4 +549,368 @@ header .row {
 .logoutWrapper .logoutBox button svg {
   margin-right: 5px;
   font-size: 18px !important;
+}
+.main .content {
+  width: 80%;
+  flex: 0 0 80%;
+  transition: all 0.3s;
+}
+.main .content.toggle {
+  width: 100%;
+  flex: 0 0 100%;
+}
+.right-content {
+  padding: 105px 35px;
+  padding-bottom: 10px;
+}
+.dashboardBoxWrapper {
+  gap: 15px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+.dashboardBoxWrapper .dashboardBox {
+  width: 374px;
+  height: 190px;
+  border-radius: 20px;
+  overflow: hidden;
+  padding: 15px;
+}
+.dashboardBoxWrapperRow .box {
+  width: 100%;
+  height: 100%;
+  background: #ccc;
+}
+/* styles.css */
+.right-content {
+  padding: 98px 35px;
+}
+
+.dashboardBoxWrapper {
+  gap: 15px;
+  width: 100%;
+}
+
+.dashboardBox {
+  width: 45%;
+  height: 250px;
+  background: #ddd; /* Fallback color */
+  color: #fff;
+  /* display: flex; */
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-radius: 8px;
+}
+
+.box {
+  height: 100%;
+  background: #eee;
+  color: #333;
+  padding: 20px;
+  border-radius: 8px;
+}
+/* General styles */
+.right-content {
+  padding: 98px 35px;
+}
+
+/* Wrapper for dashboard boxes */
+.dashboardBoxWrapper {
+  gap: 15px;
+  width: 100%;
+}
+
+.dashboardBox .col1 {
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboardBox h4 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.dashboardBox .icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+}
+
+.dashboardBox .icon {
+  font-size: 2rem;
+}
+
+.dashboardBoxWrapperRow .box {
+  width: 100%;
+  height: 100%;
+  background: #ccc;
+  border-radius: 20px;
+}
+
+/* Other styles */
+.box {
+  height: 100%;
+  background: #eee;
+  color: #333;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.dashboardBox .col1 {
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboardBox h4 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.dashboardBox .icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+}
+
+.dashboardBox .icon {
+  font-size: 2rem;
+}
+
+.content-container {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.col1 {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Aligns content to the start (left) */
+  line-height: 45px;
+}
+
+.col1 h4 {
+  margin: 0;
+  font-size: 25px !important;
+  font-weight: 600;
+}
+
+.col1 span {
+  margin-top: 5px;
+  font-size: 22px;
+}
+
+.icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dashboardBox .icon {
+  font-size: 3rem !important;
+  opacity: 0.8;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 5px;
+  background-image: linear-gradient(
+    to bottom right,
+    rgba(0, 0, 0, 0),
+    rgba(0, 0, 0, 0.3)
+  );
+  padding: 0px;
+}
+.dashboardBox .toggleicon {
+  font-size: 20px;
+  color: rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  min-width: 40px !important;
+  width: 35px !important;
+  height: 35px !important;
+  border-radius: 50% !important;
+}
+.dashboardBox {
+  width: 374px;
+  height: 170px;
+  border-radius: 20px;
+  overflow: hidden;
+  padding: 20px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: linear-gradient(to right, #1da256, #48d483);
+  text-align: left !important;
+  justify-content: flex-start !important;
+  position: relative;
+}
+
+.content-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.col1 {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.icon-container .icon {
+  font-size: 2rem;
+}
+
+.dashboardBox .d-flex.align-items-center.mt-5 {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.dashboardBox .toggleicon {
+  font-size: 1.5rem;
+  color: #fff;
+  margin-left: auto;
+}
+.dashboardBox .chart {
+  font-size: 55px;
+  color: #000;
+  opacity: 0.1;
+  position: absolute;
+  bottom: 6px;
+  left: 20px;
+}
+.dashboardBox .chart svg {
+  font-size: 140px;
+  color: #000;
+}
+.dashboardBox.bottomEle {
+  position: inherit;
+  top: 15px;
+}
+.graphBox {
+  background-image: linear-gradient(#1a50b5, #2a6ff7);
+  border-radius: 10px;
+  padding: 25px;
+}
+.graphBox p {
+  font-size: 13px;
+  color: #fff;
+  opacity: 0.7;
+}
+.card {
+  margin: 20px 0px;
+  border-radius: 10px;
+}
+.card .hd {
+  font-size: 18px !important;
+  font-weight: bold;
+  color: #403e57;
+}
+.cardFilters .col h4 {
+  font-size: 14px !important;
+  font-weight: 800;
+  text-transform: capitalize;
+}
+
+@media (min-width: 768px) {
+  .dashboardBoxWrapper .dashboardBox {
+    width: calc(50% - 15px); /* For two boxes side-by-side with gap */
+    margin-bottom: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboardBoxWrapper .dashboardBox {
+    width: 100%;
+  }
+}
+.table .thead-dark th {
+  background-color: #601b1b;
+  color: #ebf6ff;
+  text-align: center;
+  border-color: #ccc !important;
+  font-size: 13px !important;
+}
+.table tbody td {
+  font-size: 16px !important;
+  color: #403e57;
+}
+.table tbody .actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+.table tbody .actions button {
+  min-width: 35px !important;
+  width: 35px !important;
+  height: 35px !important;
+  font-size: 16px;
+  margin: 0px 3px !important;
+  height: 32px !important;
+}
+.table tbody .actions button svg {
+  font-size: 24px !important;
+}
+.table tbody .actions button .secondary {
+  background: rgba(203, 60, 231, 0.1) !important;
+}
+.table tbody .actions button .success {
+  background: rgba(26, 159, 83, 0.1) !important;
+}
+.table tbody .actions button .error {
+  background: rgba(241, 17, 51, 0.1) !important;
+}
+.table.v-align td {
+  vertical-align: middle;
+}
+.table td .old,
+.table td .new {
+  display: block;
+  width: 100%;
+}
+.table td .imgWrapper {
+  width: 20%;
+  flex: 0 0 20%;
+  margin-right: 10px;
+}
+
+.table td .info {
+  width: 70%;
+  flex: 0 0 70%;
+}
+.table td .info h6 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 0px;
+}
+.table td .info p {
+  font-size: 14px;
+  line-height: 18px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #5e5d72;
+  margin-bottom: 0px;
+}
+.table.v-align td .productBox {
+  width: 280px;
+}
+/* .table.v-align td .productBox .info {
+  width: 100%;
+} */
+.tableFooter {
+  padding-bottom: 20px;
+}
+.tableFooter .pagination {
+  margin-left: auto;
 }
