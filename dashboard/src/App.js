@@ -5,30 +5,46 @@ import Home from "./pages/Dashboard";
 import Header from "./components/Header";
 import SideBar from "./components/Sidebar";
 import { createContext, useEffect, useState } from "react";
+import Login from "./pages/Login";
 
 const Mycontext = createContext();
 
 function App() {
   const [isSidebar, setisSidebar] = useState(false);
+  const [isLogin, setIsLogin] = useState(false);
+  const [isHideSidebarAndHeader, setisHideSidebarAndHeader] = useState(false);
   const values = {
+    isLogin,
+    setIsLogin,
     isSidebar,
     setisSidebar,
+    isHideSidebarAndHeader,
+    setisHideSidebarAndHeader,
   };
 
   return (
     <BrowserRouter>
       <Mycontext.Provider value={values}>
-        <Header />
+        {isHideSidebarAndHeader !== true && <Header />}
+
         <div className="main d-flex">
+          {isHideSidebarAndHeader !== true && (
+            <div
+              className={`sidebarWrapper ${isSidebar === true ? "toggle" : ""}`}
+            >
+              <SideBar />
+            </div>
+          )}
+
           <div
-            className={`sidebarWrapper ${isSidebar === true ? "toggle" : ""}`}
+            className={`content ${isHideSidebarAndHeader === true && "full"} ${
+              isSidebar === true ? "toggle" : ""
+            }`}
           >
-            <SideBar />
-          </div>
-          <div className={`content ${isSidebar === true ? "toggle" : ""}`}>
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/dashboard" element={<Home />} />
+              <Route path="/login" element={<Login />} />
             </Routes>
           </div>
         </div>

@@ -19,6 +19,7 @@ import Divider from "@mui/material/Divider";
 import { Mycontext } from "../../App";
 
 const Header = () => {
+  // const [isLogin, setIsLogin] = useState(false);
   const context = useContext(Mycontext);
   const navigate = useNavigate();
 
@@ -67,13 +68,13 @@ const Header = () => {
             <Search />
           </div>
           <div className="col-md-5 d-flex align-items-center justify-content-end part3">
-            <Button className="rounded-circle mr-2">
+            <Button className="rounded-circle mr-1">
               <MdLightMode />
             </Button>
-            <Button className="rounded-circle mr-2">
+            <Button className="rounded-circle mr-1">
               <IoMdCart />
             </Button>
-            <Button className="rounded-circle mr-2">
+            <Button className="rounded-circle mr-1">
               <MdEmail />
             </Button>
             <Button
@@ -288,25 +289,34 @@ const Header = () => {
                 View all notifications
               </Button>
             </Menu>
+            {context.isLogin !== true ? (
+              <Link to={"/login"}>
+                {" "}
+                <Button className="btn-blue btn-lg btn-round ">Sign In</Button>
+              </Link>
+            ) : (
+              <div className="myAccWrapper">
+                <Button
+                  className="myAcc d-flex align-items-center"
+                  onClick={handleOpenAccountMenu}
+                >
+                  <div className="userImg">
+                    <span className="rounded-circle">
+                      <img
+                        src={logo2}
+                        alt=""
+                        style={{ height: "37px", width: "37px" }}
+                      />
+                    </span>
+                  </div>
+                  <div className="userInfo">
+                    <h6>Dasun </h6>
+                    <p className="mb-0">@_Dasun</p>
+                  </div>
+                </Button>
+              </div>
+            )}
 
-            <Button
-              className="myAcc d-flex align-items-center"
-              onClick={handleOpenAccountMenu}
-            >
-              <div className="userImg">
-                <span className="rounded-circle">
-                  <img
-                    src={logo2}
-                    alt=""
-                    style={{ height: "37px", width: "37px" }}
-                  />
-                </span>
-              </div>
-              <div className="userInfo">
-                <h6>Dasun Sandeepa</h6>
-                <p className="mb-0">@_Dasun</p>
-              </div>
-            </Button>
             <Menu
               anchorEl={accountAnchorEl}
               open={openAccountMenu}
