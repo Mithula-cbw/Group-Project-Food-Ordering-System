@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo1 from "../../assets/images/906343.png";
 import logo2 from "../../assets/images/thumbnail.png";
 import Button from "@mui/material/Button";
-import { MdMenuOpen } from "react-icons/md";
+import { MdMenuOpen, MdOutlineMenu } from "react-icons/md";
 import Search from "../search";
 import { MdLightMode } from "react-icons/md";
 import { IoMdCart } from "react-icons/io";
@@ -16,8 +16,10 @@ import PersonAdd from "@mui/icons-material/PersonAdd";
 import Logout from "@mui/icons-material/Logout";
 import { FaShieldAlt } from "react-icons/fa";
 import Divider from "@mui/material/Divider";
+import { Mycontext } from "../../App";
 
 const Header = () => {
+  const context = useContext(Mycontext);
   const navigate = useNavigate();
 
   const [accountAnchorEl, setAccountAnchorEl] = useState(null);
@@ -56,8 +58,11 @@ const Header = () => {
             </Link>
           </div>
           <div className="col-md-4 d-flex align-items-center part2">
-            <Button className="rounded-circle">
-              <MdMenuOpen />
+            <Button
+              className="rounded-circle"
+              onClick={() => context.setisSidebar(!context.isSidebar)}
+            >
+              {context.isSidebar === false ? <MdMenuOpen /> : <MdOutlineMenu />}
             </Button>
             <Search />
           </div>
