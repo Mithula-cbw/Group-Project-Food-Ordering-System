@@ -1,4 +1,4 @@
-import React, { PureComponent } from "react";
+import React, { PureComponent, useContext, useEffect } from "react";
 import { useState } from "react";
 import { HiDotsVertical } from "react-icons/hi";
 import { IoIosTimer } from "react-icons/io";
@@ -27,6 +27,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { Mycontext } from "../../App";
 
 export const chartData = [
   ["Category", "Amount"],
@@ -79,6 +80,11 @@ const Home = () => {
   const ITEM_HEIGHT = 48;
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
+  const context = useContext(Mycontext);
+  useEffect(() => {
+    context.setisHideSidebarAndHeader(false);
+    window.scrollTo(0,0);
+  }, []);
 
   const handleChange = (event) => {
     setshowBy(event.target.value);
