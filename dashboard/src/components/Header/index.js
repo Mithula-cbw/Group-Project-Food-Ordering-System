@@ -68,7 +68,10 @@ const Header = () => {
             <Search />
           </div>
           <div className="col-md-5 d-flex align-items-center justify-content-end part3">
-            <Button className="rounded-circle mr-1">
+            <Button
+              className="rounded-circle mr-1"
+              onClick={() => context.setThemeMode(!context.themeMode)}
+            >
               <MdLightMode />
             </Button>
             <Button className="rounded-circle mr-1">
