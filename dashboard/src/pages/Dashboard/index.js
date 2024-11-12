@@ -28,6 +28,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Mycontext } from "../../App";
+import { Link } from "react-router-dom";
 
 export const chartData = [
   ["Category", "Amount"],
@@ -447,9 +448,11 @@ const Home = () => {
                       <Button color="secondary">
                         <FaPencil />
                       </Button>
-                      <Button color="success">
-                        <FaEye />
-                      </Button>
+                      <Link to="/product/details">
+                        <Button color="success">
+                          <FaEye />
+                        </Button>
+                      </Link>
                       <Button color="error">
                         <MdDelete />
                       </Button>
