@@ -17,6 +17,7 @@ import Logout from "@mui/icons-material/Logout";
 import { FaShieldAlt } from "react-icons/fa";
 import Divider from "@mui/material/Divider";
 import { Mycontext } from "../../App";
+import UserAvatar from "../UserAvatar";
 
 const Header = () => {
   // const [isLogin, setIsLogin] = useState(false);
@@ -127,15 +128,8 @@ const Header = () => {
                 {/* Notification Items */}
                 <MenuItem onClick={handleCloseNotifyMenu}>
                   <div className="d-flex align-items-center">
-                    <div className="userImg">
-                      <span className="rounded-circle">
-                        <img
-                          src={logo2}
-                          alt=""
-                          style={{ height: "37px", width: "37px" }}
-                        />
-                      </span>
-                    </div>
+                    <UserAvatar img={"logo2"} />
+
                     <div
                       className="dropdownInfo ml-1"
                       style={{ marginLeft: "8px" }}

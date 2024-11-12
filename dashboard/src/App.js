@@ -7,6 +7,7 @@ import SideBar from "./components/Sidebar";
 import { createContext, useEffect, useState } from "react";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
+import ProductDetails from "./pages/ProductDetails";
 
 const Mycontext = createContext();
 
@@ -63,6 +64,7 @@ function App() {
               <Route path="/dashboard" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signUp" element={<SignUp />} />
+              <Route path="/product/details" element={<ProductDetails />} />
             </Routes>
           </div>
         </div>
