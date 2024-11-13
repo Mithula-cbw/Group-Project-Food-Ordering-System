@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
+import "./Responsive.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Home from "./pages/Dashboard";
 import Header from "./components/Header";
@@ -8,6 +9,8 @@ import { createContext, useEffect, useState } from "react";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import ProductDetails from "./pages/ProductDetails";
+import ProductList from "./pages/ProductList";
+import ProductUpload from "./pages/ProductUpload";
 
 const Mycontext = createContext();
 
@@ -65,6 +68,8 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/signUp" element={<SignUp />} />
               <Route path="/product/details" element={<ProductDetails />} />
+              <Route path="/product/list" element={<ProductList />} />
+              <Route path="/product/upload" element={<ProductUpload />} />
             </Routes>
           </div>
         </div>
