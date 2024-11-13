@@ -18,6 +18,7 @@ import { FaShieldAlt } from "react-icons/fa";
 import Divider from "@mui/material/Divider";
 import { Mycontext } from "../../App";
 import UserAvatar from "../UserAvatar";
+import { IoMenu } from "react-icons/io5";
 
 const Header = () => {
   // const [isLogin, setIsLogin] = useState(false);
@@ -54,20 +55,27 @@ const Header = () => {
       <div className="container-fluid w-100">
         <div className="row d-flex align-items-center w-100">
           <div className="col-md-3 part1">
-            <Link to={"/"} className="d-flex align-items-center logo">
+            <Link to={"/"} className="d-flex align-items-center logo flex-row">
               <img src={logo1} alt="" className="logo-img" />
               <span className="ml-2">Dashboard</span>
             </Link>
           </div>
-          <div className="col-md-4 d-flex align-items-center part2">
-            <Button
-              className="rounded-circle"
-              onClick={() => context.setisSidebar(!context.isSidebar)}
-            >
-              {context.isSidebar === false ? <MdMenuOpen /> : <MdOutlineMenu />}
-            </Button>
-            <Search />
-          </div>
+          {context.windowWidth > 992 && (
+            <div className="col-md-4 d-flex align-items-center part2 res-hide">
+              <Button
+                className="rounded-circle"
+                onClick={() => context.setisSidebar(!context.isSidebar)}
+              >
+                {context.isSidebar === false ? (
+                  <MdMenuOpen />
+                ) : (
+                  <MdOutlineMenu />
+                )}
+              </Button>
+              <Search />
+            </div>
+          )}
+
           <div className="col-md-5 d-flex align-items-center justify-content-end part3">
             <Button
               className="rounded-circle mr-1"
@@ -86,6 +94,10 @@ const Header = () => {
               onClick={handleOpenNotifyMenu}
             >
               <FaBell />
+            </Button>
+
+            <Button className="rounded-circle mr-2" onClick={()=>{context.openNav()}}>
+              <IoMenu />
             </Button>
 
             <Menu
@@ -306,7 +318,7 @@ const Header = () => {
                       />
                     </span>
                   </div>
-                  <div className="userInfo">
+                  <div className="userInfo res-hide">
                     <h6>Dasun </h6>
                     <p className="mb-0">@_Dasun</p>
                   </div>

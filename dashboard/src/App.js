@@ -18,13 +18,18 @@ function App() {
   const [isSidebar, setisSidebar] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
   const [isHideSidebarAndHeader, setisHideSidebarAndHeader] = useState(false);
+  // const [themeMode, setThemeMode] = useState(
+  //   localStorage.getItem("theme") ? localStorage.getItem("theme") : "light"
+  // );
   const [themeMode, setThemeMode] = useState(true);
+  const [windowWidth, setwindowWidth] = useState(window.innerWidth);
+  const [isOpenNav, setIsOpenNav] = useState(false);
 
   useEffect(() => {
     if (themeMode === true) {
       document.body.classList.remove("dark");
       document.body.classList.add("light");
-      localStorage.setItem("themeMode", "light");
+      localStorage.setItem("themeMode", "dark");
     } else {
       document.body.classList.remove("light");
       document.body.classList.add("dark");
@@ -32,6 +37,18 @@ function App() {
     }
   }, [themeMode]);
 
+  useEffect(() => {
+    const handleResize = () => {
+      setwindowWidth(window.innerWidth);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  });
+  const openNav = () => {
+    setIsOpenNav(true);
+  };
   const values = {
     isLogin,
     setIsLogin,
@@ -41,6 +58,10 @@ function App() {
     setisHideSidebarAndHeader,
     themeMode,
     setThemeMode,
+    windowWidth,
+    openNav,
+    isOpenNav,
+    setIsOpenNav,
   };
 
   return (
@@ -50,11 +71,19 @@ function App() {
 
         <div className="main d-flex">
           {isHideSidebarAndHeader !== true && (
-            <div
-              className={`sidebarWrapper ${isSidebar === true ? "toggle" : ""}`}
-            >
-              <SideBar />
-            </div>
+            <>
+              <div
+                className={`sidebarOverlay d-none ${isOpenNav ===true && "show"}`}
+                onClick={() => setIsOpenNav(false)}
+              ></div>
+              <div
+                className={`sidebarWrapper ${
+                  isSidebar === true ? "toggle" : ""
+                } ${isOpenNav === true ? "open" : ""}`}
+              >
+                <SideBar />
+              </div>
+            </>
           )}
 
           <div
