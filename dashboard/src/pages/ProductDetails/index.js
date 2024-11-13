@@ -162,7 +162,7 @@ const ProductDetails = () => {
               </div>
             </div>
             <div className="col-md-8 ml-3">
-              <div className="pt-4 pb-3 pl-4 pr-4">
+              <div className="pt-4 pb-3 pl-4 pr-4 hlo">
                 <h6 className="mb-3">Product Details</h6>
                 <h4>
                   A pizza topped with Spicy Chicken, Green Chillies, Onions &

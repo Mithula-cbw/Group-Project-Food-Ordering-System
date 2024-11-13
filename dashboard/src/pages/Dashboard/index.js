@@ -272,7 +272,7 @@ const Home = () => {
             <Box color={["#e1950e", "#f3cd29"]} icon={<GiStarsStack />} />
           </div>
         </div>
-        <div className="col-md-4 pl-0">
+        <div className="col-md-4 pl-0 topPart2">
           <div
             className="box graphBox"
             style={{

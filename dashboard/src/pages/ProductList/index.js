@@ -15,6 +15,36 @@ import Pagination from "@mui/material/Pagination";
 
 import { Mycontext } from "../../App";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import { emphasize, styled } from "@mui/material/styles";
+import Breadcrumbs from "@mui/material/Breadcrumbs";
+import Chip from "@mui/material/Chip";
+import HomeIcon from "@mui/icons-material/Home";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+
+import "react-toastify/dist/ReactToastify.css";
+
+const StyledBreadcrumb = styled(Chip)(({ theme }) => {
+  const backgroundColor =
+    theme.palette.mode === "light"
+      ? theme.palette.grey[100]
+      : theme.palette.grey[800];
+
+  return {
+    backgroundColor,
+    height: theme.spacing(3),
+    color: theme.palette.text.primary,
+    fontWeight: theme.typography.fontWeightRegular,
+    "&:hover, &:focus": {
+      backgroundColor: emphasize(backgroundColor, 0.06),
+    },
+    "&:active": {
+      boxShadow: theme.shadows[1],
+      backgroundColor: emphasize(backgroundColor, 0.12),
+    },
+  };
+});
 
 export const chartData = [
   ["Category", "Amount"],
