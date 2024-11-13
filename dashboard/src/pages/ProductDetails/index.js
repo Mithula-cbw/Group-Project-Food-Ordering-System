@@ -65,7 +65,7 @@ const ProductDetails = () => {
   };
   const goToSlide = (index) => {
     productSliderBig.current.slickGoTo(index);
-     productSliderSml.current.slickGoTo(index);
+    productSliderSml.current.slickGoTo(index);
   };
   return (
     <>
@@ -84,7 +84,11 @@ const ProductDetails = () => {
               label="Dashboard"
               icon={<HomeIcon fontSize="small" />}
             />
-            <StyledBreadcrumb label="Products" component="a" href="#" />
+            <StyledBreadcrumb
+              label="Products"
+              component="a"
+              href="/product/list"
+            />
             <StyledBreadcrumb label="Product View" />
           </Breadcrumbs>
         </Box>
