@@ -11,6 +11,8 @@ import SignUp from "./pages/SignUp";
 import ProductDetails from "./pages/ProductDetails";
 import ProductList from "./pages/ProductList";
 import ProductUpload from "./pages/ProductUpload";
+import CategoryAdd from "./pages/CategoryAdd";
+import CategoryList from "./pages/CategoryList";
 
 const Mycontext = createContext();
 
@@ -73,7 +75,9 @@ function App() {
           {isHideSidebarAndHeader !== true && (
             <>
               <div
-                className={`sidebarOverlay d-none ${isOpenNav ===true && "show"}`}
+                className={`sidebarOverlay d-none ${
+                  isOpenNav === true && "show"
+                }`}
                 onClick={() => setIsOpenNav(false)}
               ></div>
               <div
@@ -99,6 +103,8 @@ function App() {
               <Route path="/product/details" element={<ProductDetails />} />
               <Route path="/product/list" element={<ProductList />} />
               <Route path="/product/upload" element={<ProductUpload />} />
+              <Route path="/category/add" element={<CategoryAdd />} />
+              <Route path="/category/list" element={<CategoryList />} />
             </Routes>
           </div>
         </div>
