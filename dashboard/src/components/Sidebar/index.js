@@ -10,6 +10,7 @@ import { IoSettings } from "react-icons/io5";
 import { Link } from "react-router-dom";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { Mycontext } from "../../App";
+import { BiSolidCategory } from "react-icons/bi";
 
 const SideBar = () => {
   const [activeTab, isActiveTab] = useState(0);
@@ -81,12 +82,49 @@ const SideBar = () => {
               </ul>
             </div>
           </li>
+          <li>
+            <Button
+              className={`w-100 ${
+                activeTab === 2 && isToggleSubmenu === true ? "active" : ""
+              }`}
+              onClick={() => isopenSubMenu(2)}
+            >
+              <span className="icon">
+                <BiSolidCategory />
+              </span>
+              Category
+              <span className="arrow">
+                {activeTab === 2 && isToggleSubmenu ? (
+                  <FaAngleDown />
+                ) : (
+                  <FaAngleRight />
+                )}
+              </span>
+            </Button>
+            <div
+              className={`submenuWrapper ${
+                activeTab === 2 && isToggleSubmenu === true
+                  ? "colapse"
+                  : "colapsed"
+              }`}
+            >
+              <ul className="submenu">
+                <li>
+                  <Link to="/category/list">Category List</Link>
+                </li>
+                <li>
+                  <Link to="/category/add">Add a Category</Link>
+                </li>
+              </ul>
+            </div>
+          </li>
+
           {/* Repeat for other buttons */}
           <li>
             <Link to="/">
               <Button
-                className={`w-100 ${activeTab === 2 ? "active" : ""}`}
-                onClick={() => isopenSubMenu(2)}
+                className={`w-100 ${activeTab === 3 ? "active" : ""}`}
+                onClick={() => isopenSubMenu(3)}
               >
                 <span className="icon">
                   <IoMdCart />
@@ -101,8 +139,8 @@ const SideBar = () => {
           <li>
             <Link to="/">
               <Button
-                className={`w-100 ${activeTab === 3 ? "active" : ""}`}
-                onClick={() => isopenSubMenu(3)}
+                className={`w-100 ${activeTab === 4 ? "active" : ""}`}
+                onClick={() => isopenSubMenu(4)}
               >
                 <span className="icon">
                   <BiSolidMessageSquareDetail />
@@ -117,29 +155,13 @@ const SideBar = () => {
           <li>
             <Link to="/">
               <Button
-                className={`w-100 ${activeTab === 4 ? "active" : ""}`}
-                onClick={() => isopenSubMenu(4)}
+                className={`w-100 ${activeTab === 5 ? "active" : ""}`}
+                onClick={() => isopenSubMenu(5)}
               >
                 <span className="icon">
                   <IoMdNotifications />
                 </span>
                 Notifications
-                <span className="arrow">
-                  <FaAngleRight />
-                </span>
-              </Button>
-            </Link>
-          </li>
-          <li>
-            <Link to="/">
-              <Button
-                className={`w-100 ${activeTab === 5 ? "active" : ""}`}
-                onClick={() => isopenSubMenu(5)}
-              >
-                <span className="icon">
-                  <IoSettings />
-                </span>
-                Settings
                 <span className="arrow">
                   <FaAngleRight />
                 </span>
@@ -155,39 +177,7 @@ const SideBar = () => {
                 <span className="icon">
                   <IoSettings />
                 </span>
-                Test1
-                <span className="arrow">
-                  <FaAngleRight />
-                </span>
-              </Button>
-            </Link>
-          </li>
-          <li>
-            <Link to="/">
-              <Button
-                className={`w-100 ${activeTab === 7 ? "active" : ""}`}
-                onClick={() => isopenSubMenu(7)}
-              >
-                <span className="icon">
-                  <IoSettings />
-                </span>
-                test2
-                <span className="arrow">
-                  <FaAngleRight />
-                </span>
-              </Button>
-            </Link>
-          </li>
-          <li>
-            <Link to="/">
-              <Button
-                className={`w-100 ${activeTab === 8 ? "active" : ""}`}
-                onClick={() => isopenSubMenu(8)}
-              >
-                <span className="icon">
-                  <IoSettings />
-                </span>
-                test3
+                Settings
                 <span className="arrow">
                   <FaAngleRight />
                 </span>

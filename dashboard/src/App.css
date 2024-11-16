@@ -1831,3 +1831,9 @@ h6 {
 .btn-blue:hover {
   background-color: #0056b3;
 }
+.editcat .css-10d30g3-MuiPaper-root-MuiDialog-paper {
+  width: 600px !important;
+}
+button .loder{
+  width: 25px !important;
+}
