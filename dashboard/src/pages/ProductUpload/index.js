@@ -168,7 +168,7 @@ const ProductDetails = () => {
                 <h5 className="mb-4">Basic Information</h5>
 
                 <div className="form-group">
-                  <h6>Food Item Name</h6>
+                  <h6>Food-Item Name</h6>
                   <input
                     type="text"
                     name="name"
@@ -298,19 +298,6 @@ const ProductDetails = () => {
                 <div className="row">
                   <div className="col-md-4">
                     <div className="form-group">
-                      <h6>Brand</h6>
-                      <input
-                        type="text"
-                        name="brand"
-                        value={formFields.brand}
-                        onChange={handleInputChange}
-                        placeholder="Enter brand name"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="col-md-4">
-                    <div className="form-group">
                       <h6>Discount (%)</h6>
                       <input
                         type="text"
@@ -341,15 +328,18 @@ const ProductDetails = () => {
                       </Select>
                     </div>
                   </div>
+                  <div className="col-md-3 ml-3">
+                    <div className="form-group mt-3 ml-3">
+                      <h6>Rating</h6>
+                      <Rating
+                        name="rating"
+                        value={ratingValue}
+                        onChange={(event, newValue) => setRatingValue(newValue)}
+                      />
+                    </div>
+                  </div>
                 </div>
-                <div className="form-group mt-3">
-                  <h6>Rating</h6>
-                  <Rating
-                    name="rating"
-                    value={ratingValue}
-                    onChange={(event, newValue) => setRatingValue(newValue)}
-                  />
-                </div>
+
                 <div className="card p-4 mt-0">
                   <div className="imageUploadSec">
                     <h5 className="mb-4">Media And Published</h5>

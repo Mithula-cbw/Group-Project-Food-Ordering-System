@@ -9,10 +9,16 @@ const productSchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  images: [{
+  images: [
+    {
+      type: String,
+      required: true,
+    },
+  ],
+  type: {
     type: String,
-    required: true,
-  }],
+    default: "",
+  },
   category: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Category",
@@ -22,15 +28,24 @@ const productSchema = mongoose.Schema({
     type: Number,
     default: 0,
   },
+  oldPrice: {
+    type: Number,
+    default: 0,
+  },
   countInStock: {
     type: Number,
     required: true,
   },
-  rating: {
+  discount: {
     type: Number,
     default: 0,
   },
-  numReviews: {
+  size: {
+    type: String,
+    enum: ["Small", "Medium", "Large", "Supreme"], // Adjust as needed
+    default: "Medium",
+  },
+  rating: {
     type: Number,
     default: 0,
   },
