@@ -1834,6 +1834,22 @@ h6 {
 .editcat .css-10d30g3-MuiPaper-root-MuiDialog-paper {
   width: 600px !important;
 }
-button .loder{
+button .loder {
   width: 25px !important;
+}
+.catbtn {
+  padding-right: 10px !important;
+  display: flex;
+  flex-direction: column;
+}
+
+.align-right-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%; /* Ensure it spans the full width */
+}
+.topLoadingBar {
+  height: 4px !important;
+  background: #1866ee !important;
 }

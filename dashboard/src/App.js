@@ -13,6 +13,7 @@ import ProductList from "./pages/ProductList";
 import ProductUpload from "./pages/ProductUpload";
 import CategoryAdd from "./pages/CategoryAdd";
 import CategoryList from "./pages/CategoryList";
+import LoadingBar from "react-top-loading-bar";
 
 const Mycontext = createContext();
 
@@ -26,6 +27,7 @@ function App() {
   const [themeMode, setThemeMode] = useState(true);
   const [windowWidth, setwindowWidth] = useState(window.innerWidth);
   const [isOpenNav, setIsOpenNav] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     if (themeMode === true) {
@@ -64,11 +66,20 @@ function App() {
     openNav,
     isOpenNav,
     setIsOpenNav,
+    progress,
+    setProgress,
   };
 
   return (
     <BrowserRouter>
       <Mycontext.Provider value={values}>
+        <LoadingBar
+          color="#f11946"
+          progress={progress}
+          onLoaderFinished={() => setProgress(0)}
+          className="topLoadingBar"
+        />
+
         {isHideSidebarAndHeader !== true && <Header />}
 
         <div className="main d-flex">

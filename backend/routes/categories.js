@@ -14,13 +14,16 @@ cloudinary.config({
 //get all list
 
 router.get("/", async (req, res) => {
-  const categoryList = await Category.find();
-
-  if (!categoryList) {
+  try {
+    const categoryList = await Category.find();
+    if (!categoryList) {
+      res.status(500).json({ success: false });
+    } else {
+      res.send(categoryList);
+    }
+  } catch (error) {
     res.status(500).json({ success: false });
   }
-
-  res.send(categoryList);
 });
 
 //get by id

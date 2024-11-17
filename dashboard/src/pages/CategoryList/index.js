@@ -1,21 +1,27 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Button } from "@mui/material";
-import { FaPencil } from "react-icons/fa6";
-import { FaEye } from "react-icons/fa";
+import { FaPencil, FaEye } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import Pagination from "@mui/material/Pagination";
 import { Mycontext } from "../../App";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { deleteData, editData, fetchDataFromApi } from "../../utils/Api";
 import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import { styled } from "@mui/system";
+import { emphasize, styled } from "@mui/material/styles";
+import Chip from "@mui/material/Chip";
+import Breadcrumbs from "@mui/material/Breadcrumbs";
+import HomeIcon from "@mui/icons-material/Home";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import CircularProgress from "@mui/material/CircularProgress";
+import Box from "@mui/material/Box";
+import { FaEdit } from "react-icons/fa"; // Use FaEdit instead of FaPencil
+import { FaPen } from "react-icons/fa"; // Use FaPen instead of FaPencil
+import LinearProgress from "@mui/material/LinearProgress"; // Import this at the top
 
 // Styled Components
 const StyledDialog = styled(Dialog)(({ theme }) => ({
@@ -30,7 +36,7 @@ const StyledDialog = styled(Dialog)(({ theme }) => ({
     to: { opacity: 1, transform: "scale(1)" },
   },
   "& .MuiBackdrop-root": {
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Adjust the opacity of the backdrop
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
 }));
 
@@ -62,19 +68,36 @@ const StyledButton = styled(Button)(({ theme }) => ({
   fontSize: "1rem",
   padding: "10px 20px",
   borderRadius: "20px",
-  backgroundColor: "#3279a8", // Normal background color
-  color: "#000", // Text color in normal state
-  transition: "transform 0.2s ease-in-out, background-color 0.2s ease-in-out", // Smooth transition for background color change
+  backgroundColor: "#3279a8",
+  color: "#000",
+  transition: "transform 0.2s ease-in-out, background-color 0.2s ease-in-out",
   "&:hover": {
     transform: "scale(1.1)",
-    backgroundColor: "#3279a8", // Hover background color
-  },
-  "&:active": {
-    backgroundColor: "#3279a8", // Active background color (when clicked)
+    backgroundColor: "#3279a8",
   },
 }));
 
-const itemsPerPage = 5;
+const StyledBreadcrumb = styled(Chip)(({ theme }) => {
+  const backgroundColor =
+    theme.palette.mode === "light"
+      ? theme.palette.grey[100]
+      : theme.palette.grey[800];
+  return {
+    backgroundColor,
+    height: theme.spacing(3),
+    color: theme.palette.text.primary,
+    fontWeight: theme.typography.fontWeightRegular,
+    "&:hover, &:focus": {
+      backgroundColor: emphasize(backgroundColor, 0.06),
+    },
+    "&:active": {
+      boxShadow: theme.shadows[1],
+      backgroundColor: emphasize(backgroundColor, 0.12),
+    },
+  };
+});
+
+const itemsPerPage = 6;
 
 const CategoryList = () => {
   const [catData, setCatData] = useState([]);
@@ -87,17 +110,44 @@ const CategoryList = () => {
     color: "",
   });
   const [editId, setEditId] = useState(null);
-
   const context = useContext(Mycontext);
+  const navigate = useNavigate();
+  const [confirmDelete, setConfirmDelete] = useState(false); // Controls dialog visibility
+  const [deleteId, setDeleteId] = useState(null); // Tracks ID of category to delete
+  const openDeleteDialog = (id) => {
+    setDeleteId(id); // Set the ID of the category to delete
+    setConfirmDelete(true); // Show confirmation dialog
+  };
+  const closeDeleteDialog = () => {
+    setConfirmDelete(false); // Hide confirmation dialog
+  };
+  const handleDeleteConfirm = () => {
+    setIsLoading(true); // Show loading indicator during deletion
+    deleteData(`/api/category/${deleteId}`)
+      .then(() => {
+        setCatData((prevData) =>
+          prevData.filter((item) => item._id !== deleteId)
+        ); // Remove deleted category
+        toast.success("Category deleted successfully!");
+        setIsLoading(false);
+        setConfirmDelete(false); // Close confirmation dialog
+      })
+      .catch(() => {
+        toast.error("Failed to delete the category.");
+        setIsLoading(false);
+      });
+  };
 
   useEffect(() => {
     context.setisHideSidebarAndHeader(false);
     window.scrollTo(0, 0);
 
-    // Fetch categories from API
+    setIsLoading(true); // Show loading indicator
+
     fetchDataFromApi("/api/category").then((res) => {
       if (res) {
-        setCatData(res); // Assuming `res` is the array of categories
+        setCatData(res);
+        setIsLoading(false); // Hide loading indicator when data is fetched
       }
     });
   }, [context]);
@@ -131,8 +181,7 @@ const CategoryList = () => {
 
   const catEdit = (e) => {
     e.preventDefault();
-    // Check if images is an array or string, handle accordingly
-    setIsLoading(true);
+    setIsLoading(true); // Set loading to true when editing starts
     const imagesToUpdate = Array.isArray(formFields.images)
       ? formFields.images
       : [formFields.images];
@@ -149,12 +198,13 @@ const CategoryList = () => {
             setCatData(res);
           }
           setOpen(false);
-          setIsLoading(false);
-          toast.success("Category updated successfully!"); // Success message
+          setIsLoading(false); // Hide loading when update is complete
+          toast.success("Category updated successfully!");
         });
       })
       .catch(() => {
-        toast.error("Failed to update the category."); // Error message
+        toast.error("Failed to update the category.");
+        setIsLoading(false); // Hide loading if there's an error
       });
   };
 
@@ -168,7 +218,7 @@ const CategoryList = () => {
   const addimgurl = (e) => {
     setFormFields((prevState) => ({
       ...prevState,
-      images: e.target.value, // Directly set the image URL as a string
+      images: e.target.value,
     }));
   };
 
@@ -176,27 +226,51 @@ const CategoryList = () => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
   const deleteCat = (id) => {
+    setIsLoading(true); // Set loading to true when deleting
     deleteData(`/api/category/${id}`)
       .then((res) => {
         fetchDataFromApi("/api/category").then((res) => {
           if (res) {
             setCatData(res);
-            toast.success("Category Deleted successfully!");
+            toast.success("Category deleted successfully!");
           }
-          setOpen(false);
+          setIsLoading(false); // Hide loading once deletion is complete
         });
       })
       .catch(() => {
-        toast.error("Failed to update the category."); // Error message
+        toast.error("Failed to delete the category.");
+        setIsLoading(false); // Hide loading if there's an error
       });
   };
+
   return (
     <div className="right-content">
-      <ToastContainer position="bottom-right" /> {/* Toast container */}
+      <ToastContainer position="bottom-right" />
       <div className="row dashboardBoxWrapperRow">
+        {isLoading && <LinearProgress />}
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
+          className="cardd shadow border-0 w-100 mt-3 mb-2"
+        >
+          <h3 className="m-3 p-2">Categories</h3>
+          <Breadcrumbs aria-label="breadcrumb">
+            <StyledBreadcrumb
+              component="a"
+              href="/"
+              label="Dashboard"
+              icon={<HomeIcon fontSize="small" />}
+            />
+            <StyledBreadcrumb label="Category List" />
+          </Breadcrumbs>
+          <Link to="/category/add">
+            <Button className="btn-blue catbtn">Add Category</Button>
+          </Link>
+        </Box>
         <div className="card shadow border-0 p-3 mt-4">
-          <h3 className="hd">Categories</h3>
           <div className="table-responsive mt-3">
             <table className="table table-bordered align-items-center v-align">
               <thead className="thead-dark">
@@ -244,89 +318,87 @@ const CategoryList = () => {
                           color="secondary"
                           onClick={() => editCat(item._id)}
                         >
-                          <FaPencil />
+                          <FaPen />
                         </Button>
-                        <Link to={`/category/details/${item._id}`}>
-                          <Button color="success">
-                            <FaEye />
-                          </Button>
-                        </Link>
                         <Button
                           color="error"
-                          onClick={() => deleteCat(item._id)}
+                          onClick={() => openDeleteDialog(item._id)}
                         >
                           <MdDelete />
                         </Button>
+                        <Dialog
+                          open={confirmDelete}
+                          onClose={closeDeleteDialog}
+                        >
+                          <DialogTitle>Confirm Delete</DialogTitle>
+                          <DialogContent>
+                            Are you sure you want to delete this category?
+                          </DialogContent>
+                          <DialogActions>
+                            <Button onClick={closeDeleteDialog} color="primary">
+                              Cancel
+                            </Button>
+                            <Button onClick={handleDeleteConfirm} color="error">
+                              Confirm
+                            </Button>
+                          </DialogActions>
+                        </Dialog>
                       </div>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            <div className="d-flex tableFooter">
-              <Pagination
-                count={Math.ceil(catData.length / itemsPerPage)}
-                page={currentPage}
-                onChange={handleChangePage}
-                color="primary"
-                className="pagination"
-              />
-            </div>
+            <Pagination
+              count={Math.ceil(catData.length / itemsPerPage)}
+              page={currentPage}
+              onChange={handleChangePage}
+              shape="rounded"
+              color="primary"
+            />
           </div>
         </div>
       </div>
       <StyledDialog open={open} onClose={handleClose}>
         <StyledDialogTitle>Edit Category</StyledDialogTitle>
-        <form onSubmit={catEdit}>
-          <DialogContent>
+        <DialogContent>
+          <form onSubmit={catEdit}>
             <StyledTextField
               autoFocus
-              required
               margin="dense"
-              id="category"
-              name="name"
               label="Category Name"
-              type="text"
-              fullWidth
+              name="name"
               value={formFields.name}
               onChange={inputChange}
+              fullWidth
             />
             <StyledTextField
-              required
               margin="dense"
-              id="images"
-              name="images"
               label="Image URL"
-              type="text"
-              fullWidth
+              name="images"
               value={formFields.images}
               onChange={addimgurl}
+              fullWidth
             />
             <StyledTextField
-              required
               margin="dense"
-              id="color"
-              name="color"
               label="Color"
-              type="text"
-              fullWidth
+              name="color"
               value={formFields.color}
               onChange={inputChange}
+              fullWidth
             />
-          </DialogContent>
-          <StyledDialogActions>
-            <StyledButton onClick={handleClose} color="secondary">
-              Cancel
-            </StyledButton>
-            <StyledButton type="submit" color="primary" disabled={isLoading}>
-              {isLoading ? (
-                <CircularProgress size={24} color="#ffffff" />
-              ) : (
-                "Save"
-              )}
-            </StyledButton>
-          </StyledDialogActions>
-        </form>
+            <StyledDialogActions>
+              <StyledButton onClick={handleClose} color="secondary">
+                Cancel
+              </StyledButton>
+
+              <StyledButton type="submit" variant="contained">
+                {isLoading ? <CircularProgress size={24} /> : "Save Changes"}
+              </StyledButton>
+            </StyledDialogActions>
+          </form>
+        </DialogContent>
       </StyledDialog>
     </div>
   );
