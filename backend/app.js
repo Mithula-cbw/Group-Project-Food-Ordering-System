@@ -21,6 +21,7 @@ app.use(bodyParser.json());
 const categoryRoutes = require("./routes/categories");
 const productRoutes = require("./routes/product");
 
+app.use(`/uploads`, express.static("uploads"));
 app.use(`/api/category`, categoryRoutes);
 app.use(`/api/products`, productRoutes);
 

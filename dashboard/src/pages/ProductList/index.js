@@ -1,30 +1,90 @@
-import React, { PureComponent, useContext, useEffect } from "react";
+import React, { PureComponent, useContext, useEffect, useRef } from "react";
 import { useState } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import Box from "../Dashboard/components/Box";
 import { FaCartShopping } from "react-icons/fa6";
+import LoadingBar from "react-top-loading-bar";
 import { IoBagHandleSharp } from "react-icons/io5";
-import { GiStarsStack } from "react-icons/gi";
-import { Button, Menu, MenuItem } from "@mui/material";
+import { Button, LinearProgress, Menu, MenuItem, Rating } from "@mui/material";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import { FaPencil } from "react-icons/fa6";
 import { FaEye } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import Pagination from "@mui/material/Pagination";
-
 import { Mycontext } from "../../App";
 import { Link } from "react-router-dom";
-import axios from "axios";
 import { emphasize, styled } from "@mui/material/styles";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import Chip from "@mui/material/Chip";
 import HomeIcon from "@mui/icons-material/Home";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-
 import "react-toastify/dist/ReactToastify.css";
+import { deleteData, fetchDataFromApi } from "../../utils/Api";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import TextField from "@mui/material/TextField";
 
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from "@mui/material";
+// Styled Components
+const StyledDialog = styled(Dialog)(({ theme }) => ({
+  "& .MuiPaper-root": {
+    borderRadius: "15px",
+    background: "linear-gradient(to bottom right, #f7f9fc, #e0e6ed)",
+    boxShadow: "0px 10px 30px rgba(0, 0, 0, 0.2)",
+    animation: "fadeIn 0.3s ease-in-out",
+  },
+  "@keyframes fadeIn": {
+    from: { opacity: 0, transform: "scale(0.9)" },
+    to: { opacity: 1, transform: "scale(1)" },
+  },
+  "& .MuiBackdrop-root": {
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+}));
+
+const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
+  textAlign: "center",
+  fontWeight: "bold",
+  fontSize: "1.5rem",
+  color: "#3f51b5",
+  borderBottom: "1px solid #d1d9e6",
+}));
+
+const StyledTextField = styled(TextField)(({ theme }) => ({
+  "& .MuiInputBase-root": {
+    borderRadius: "10px",
+    backgroundColor: "#ffffff",
+  },
+  "& .MuiInputLabel-root": {
+    color: "#707070",
+  },
+}));
+
+const StyledDialogActions = styled(DialogActions)(({ theme }) => ({
+  justifyContent: "center",
+  paddingBottom: theme.spacing(3),
+}));
+
+const StyledButton = styled(Button)(({ theme }) => ({
+  textTransform: "none",
+  fontSize: "1rem",
+  padding: "10px 20px",
+  borderRadius: "20px",
+  backgroundColor: "#3279a8",
+  color: "#000",
+  transition: "transform 0.2s ease-in-out, background-color 0.2s ease-in-out",
+  "&:hover": {
+    transform: "scale(1.1)",
+    backgroundColor: "#3279a8",
+  },
+}));
 const StyledBreadcrumb = styled(Chip)(({ theme }) => {
   const backgroundColor =
     theme.palette.mode === "light"
@@ -46,205 +106,128 @@ const StyledBreadcrumb = styled(Chip)(({ theme }) => {
   };
 });
 
-export const chartData = [
-  ["Category", "Amount"],
-  ["2021", 4000],
-  ["2022", 2000],
-  ["2023", 2500],
-  ["2024", 2500],
-];
-
-export const chartOptions = {
-  title: "Anual sale",
-  pieHole: 0.5, // Donut style
-  is3D: false,
-  colors: ["#ff6b6b", "#f8c372", "#4ecdc4", "#1feec9"],
-  legend: {
-    position: "bottom",
-    alignment: "center",
-    textStyle: {
-      color: "#fff",
-      fontSize: 14,
-    },
-  },
-  pieSliceTextStyle: {
-    color: "#fff",
-  },
-  backgroundColor: "transparent",
-  animation: {
-    startup: true,
-    easing: "inAndOut",
-    duration: 1000, // Duration of animation in milliseconds
-  },
-  tooltip: {
-    textStyle: {
-      color: "#000",
-      fontSize: 14,
-    },
-    showColorCode: true,
-  },
-  chartArea: { width: "90%", height: "80%" },
-};
 const itemsPerPage = 5; // Number of items per page
 const ProductList = () => {
   const [showBy, setshowBy] = React.useState("");
   const [catBy, setCatBy] = React.useState("");
   const [currentPage, setCurrentPage] = useState(1); // Track current page
-
+  const [productList, setproductList] = useState([]);
   const context = useContext(Mycontext);
+  const loadingBarRef = useRef(null);
+  const [progress, setProgress] = useState(0);
+
+  const [confirmDelete, setConfirmDelete] = useState(false); // Controls dialog visibility
+  const [deleteProductId, setDeleteProductId] = useState(null); // Tracks ID of product to delete
+  const [isLoading, setIsLoading] = useState(false); // Optional: for loading indicator during deletion
+
+  // Open delete dialog
+  const openDeleteDialog = (id) => {
+    setDeleteProductId(id); // Set the ID of the product to delete
+    setConfirmDelete(true); // Show confirmation dialog
+  };
+
+  // Close delete dialog
+  const closeDeleteDialog = () => {
+    setConfirmDelete(false); // Hide confirmation dialog
+  };
+
+  // Handle confirm delete
+  const handleDeleteConfirm = () => {
+    setIsLoading(true); // Show loading indicator during deletion
+    deleteData(`/api/products/${deleteProductId}`) // Assuming deleteData handles your API deletion
+      .then(() => {
+        setproductList((prevData) =>
+          prevData.filter((item) => item._id !== deleteProductId)
+        ); // Remove deleted product
+        toast.success("Product deleted successfully!");
+        setIsLoading(false);
+        setConfirmDelete(false); // Close confirmation dialog
+      })
+      .catch(() => {
+        toast.error("Failed to delete the product.");
+        setIsLoading(false);
+      });
+  };
+
   useEffect(() => {
     context.setisHideSidebarAndHeader(false);
     window.scrollTo(0, 0);
+    setIsLoading(true);
+    // Start loading
+    loadingBarRef.current.continuousStart();
+
+    fetchDataFromApi("/api/products")
+      .then((res) => {
+        setproductList(res);
+        setIsLoading(false);
+      })
+      .finally(() => {
+        // Complete loading
+        loadingBarRef.current.complete();
+      });
   }, []);
+
+  console.log("Base URL:", context.baseUrl);
 
   const handleChangePage = (event, value) => {
     setCurrentPage(value);
   };
 
-  const data = [
-    {
-      uid: "001",
-      product: "Margherita Pizza...",
-      category: "Pizza",
-      type: "Vegetarian",
-      price: "$12.99",
-      stock: 20,
-      rating: "4.5(16)",
-      order: 50,
-      sales: "$49.50",
-      imgSrc:
-        "https://adminsc.pizzahut.lk//images/mainmenu/52b93289-98a9-4296-87a4-0a0e0acda8c6.jpg",
-    },
-    {
-      uid: "001",
-      product: "Margherita Pizza...",
-      category: "Pizza",
-      type: "Vegetarian",
-      price: "$12.99",
-      stock: 20,
-      rating: "4.5(16)",
-      order: 50,
-      sales: "$49.50",
-      imgSrc:
-        "https://adminsc.pizzahut.lk//images/mainmenu/52b93289-98a9-4296-87a4-0a0e0acda8c6.jpg",
-    },
-    {
-      uid: "001",
-      product: "Margherita Pizza...",
-      category: "Pizza",
-      type: "Vegetarian",
-      price: "$12.99",
-      stock: 20,
-      rating: "4.5(16)",
-      order: 50,
-      sales: "$49.50",
-      imgSrc:
-        "https://adminsc.pizzahut.lk//images/mainmenu/52b93289-98a9-4296-87a4-0a0e0acda8c6.jpg",
-    },
-    {
-      uid: "001",
-      product: "Margherita Pizza...",
-      category: "Pizza",
-      type: "Vegetarian",
-      price: "$12.99",
-      stock: 20,
-      rating: "4.5(16)",
-      order: 50,
-      sales: "$49.50",
-      imgSrc:
-        "https://adminsc.pizzahut.lk//images/mainmenu/52b93289-98a9-4296-87a4-0a0e0acda8c6.jpg",
-    },
-    {
-      uid: "001",
-      product: "Margherita Pizza...",
-      category: "Pizza",
-      type: "Vegetarian",
-      price: "$12.99",
-      stock: 20,
-      rating: "4.5(16)",
-      order: 50,
-      sales: "$49.50",
-      imgSrc:
-        "https://adminsc.pizzahut.lk//images/mainmenu/52b93289-98a9-4296-87a4-0a0e0acda8c6.jpg",
-    },
-    {
-      uid: "001",
-      product: "Margherita Pizza...",
-      category: "Pizza",
-      type: "Vegetarian",
-      price: "$12.99",
-      stock: 20,
-      rating: "4.5(16)",
-      order: 50,
-      sales: "$49.50",
-      imgSrc:
-        "https://adminsc.pizzahut.lk//images/mainmenu/52b93289-98a9-4296-87a4-0a0e0acda8c6.jpg",
-    },
-    {
-      uid: "001",
-      product: "Margherita Pizza...",
-      category: "Pizza",
-      type: "Vegetarian",
-      price: "$12.99",
-      stock: 20,
-      rating: "4.5(16)",
-      order: 50,
-      sales: "$49.50",
-      imgSrc:
-        "https://adminsc.pizzahut.lk//images/mainmenu/52b93289-98a9-4296-87a4-0a0e0acda8c6.jpg",
-    },
-    {
-      uid: "001",
-      product: "Margherita Pizza...",
-      category: "Pizza",
-      type: "Vegetarian",
-      price: "$12.99",
-      stock: 20,
-      rating: "4.5(16)",
-      order: 50,
-      sales: "$49.50",
-      imgSrc:
-        "https://adminsc.pizzahut.lk//images/mainmenu/52b93289-98a9-4296-87a4-0a0e0acda8c6.jpg",
-    },
-    {
-      uid: "001",
-      product: "Margherita Pizza...",
-      category: "Pizza",
-      type: "Vegetarian",
-      price: "$12.99",
-      stock: 20,
-      rating: "4.5(16)",
-      order: 50,
-      sales: "$49.50",
-      imgSrc:
-        "https://adminsc.pizzahut.lk//images/mainmenu/52b93289-98a9-4296-87a4-0a0e0acda8c6.jpg",
-    },
-    // Add more products here
-  ];
-  const filteredData = data.filter((item) => {
-    let isValid = true;
+  const [filteredProductList, setFilteredProductList] = useState([]);
 
-    // Filter by 'showBy' value
-    if (showBy && item.someProperty !== showBy) {
-      isValid = false;
+  useEffect(() => {
+    let filtered = productList;
+
+    // Filter by category
+    if (catBy) {
+      filtered = filtered.filter(
+        (product) => product.category.name.toLowerCase() === catBy.toLowerCase()
+      );
     }
 
-    // Filter by 'catBy' value
-    if (catBy && item.category !== catBy) {
-      isValid = false;
+    // Filter by ratings
+    if (showBy) {
+      const ratingFilter = parseFloat(showBy);
+      filtered = filtered.filter((product) => product.rating >= ratingFilter);
     }
 
-    return isValid;
-  });
+    setFilteredProductList(filtered);
+  }, [catBy, showBy, productList]);
 
-  const paginatedData = data.slice(
+  const paginatedData = filteredProductList.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
   return (
     <div className="right-content ">
+      <ToastContainer position="bottom-right" />
       <div className="row dashboardBoxWrapperRow">
+        {isLoading && <LinearProgress />}
+        <LoadingBar
+          color="#3446eb"
+          height={"4px"}
+          ref={loadingBarRef}
+          progress={progress}
+        />
+        <div className="boxxxx card shadow p-3">
+          <div className="flex-container">
+            <h5 className="topic">Food Item Upload</h5>
+            <Breadcrumbs aria-label="breadcrumb">
+              <StyledBreadcrumb
+                component="a"
+                href="/"
+                label="Dashboard"
+                icon={<HomeIcon fontSize="small" />}
+              />
+              <StyledBreadcrumb label="Item List" />
+            </Breadcrumbs>
+            <Link to="/product/upload">
+              <Button className="btn-blue catbtn">Add Item</Button>
+            </Link>
+          </div>
+        </div>
+
         <div className="col-md-4">
           <Box
             color={["#1da256", "#48d483"]}
@@ -273,15 +256,17 @@ const ProductList = () => {
                   onChange={(e) => setshowBy(e.target.value)}
                   displayEmpty
                   inputProps={{ "aria-label": "Without label" }}
-                  labelId="demo-simple-select-label"
+                  labelId="rating-select-label"
                   className="w-100"
                 >
                   <MenuItem value="">
-                    <em>None</em>
+                    <em>All</em>
                   </MenuItem>
-                  <MenuItem value={10}>Ten</MenuItem>
-                  <MenuItem value={20}>Twenty</MenuItem>
-                  <MenuItem value={30}>Thirty</MenuItem>
+                  <MenuItem value="1">1+ Stars</MenuItem>
+                  <MenuItem value="2">2+ Stars</MenuItem>
+                  <MenuItem value="3">3+ Stars</MenuItem>
+                  <MenuItem value="4">4+ Stars</MenuItem>
+                  <MenuItem value="5">5 Stars</MenuItem>
                 </Select>
               </FormControl>
             </div>
@@ -293,15 +278,19 @@ const ProductList = () => {
                   onChange={(e) => setCatBy(e.target.value)}
                   displayEmpty
                   inputProps={{ "aria-label": "Without label" }}
-                  labelId="demo-simple-select-label"
+                  labelId="category-select-label"
                   className="w-100"
                 >
                   <MenuItem value="">
-                    <em>None</em>
+                    <em>All</em>
                   </MenuItem>
-                  <MenuItem value={10}>Ten</MenuItem>
-                  <MenuItem value={20}>Twenty</MenuItem>
-                  <MenuItem value={30}>Thirty</MenuItem>
+                  <MenuItem value="Pizza">Pizza</MenuItem>
+                  <MenuItem value="Burger">Burger</MenuItem>
+                  <MenuItem value="Appetizers">Appetizers</MenuItem>
+                  <MenuItem value="Dessert">Dessert</MenuItem>
+                  <MenuItem value="Drinks">Drinks</MenuItem>
+                  <MenuItem value="Salad">Salad</MenuItem>
+                  <MenuItem value="Pasta">Pasta</MenuItem>
                 </Select>
               </FormControl>
             </div>
@@ -311,65 +300,112 @@ const ProductList = () => {
             <table className="table table-bordered align-items-center v-align">
               <thead className="thead-dark">
                 <tr>
-                  <th>UID</th>
-                  <th style={{ width: "300px" }}>PRODUCT</th>
+                  <th>PID</th>
+                  <th style={{ width: "200px" }}>PRODUCT</th>
                   <th>CATEGORY</th>
                   <th>TYPE</th>
                   <th>PRICE</th>
-                  <th>STOCK</th>
                   <th>RATING</th>
-                  <th>ORDER</th>
-                  <th>SALES</th>
+                  <th>IS-FEATURED</th>
                   <th>ACTION</th>
                 </tr>
               </thead>
               <tbody>
-                {paginatedData.map((item) => (
-                  <tr key={item.uid}>
-                    <td>{item.uid}</td>
-                    <td>
-                      <div className="d-flex align-items-center productBox">
-                        <div className="imgWrapper">
-                          <div className="img">
-                            <img src={item.imgSrc} alt="" className="w-100" />
+                {paginatedData.length > 0 ? (
+                  paginatedData.map((item, index) => (
+                    <tr key={item._id}>
+                      <td>#00{index + 1}</td>
+                      <td>
+                        <div className="d-flex align-items-center">
+                          <img
+                            src={item.images[0]}
+                            alt={item.name}
+                            style={{
+                              width: "50px",
+                              height: "50px",
+                              marginRight: "10px",
+                            }}
+                          />
+                          <div>
+                            <h6>{item.name}</h6>
+                            <p>{item.description}</p>
                           </div>
                         </div>
-                        <div className="info pl-0">
-                          <h6>{item.product}</h6>
-                          <p>Product description here.</p>
+                      </td>
+                      <td>{item.category.name}</td>
+                      <td>{item.type}</td>
+                      <td>
+                        <div style={{ width: "70px" }}>
+                          <del className="old">${item.oldPrice}</del>
+                          <span className="new text-danger">${item.price}</span>
                         </div>
-                      </div>
-                    </td>
-                    <td>{item.category}</td>
-                    <td>{item.type}</td>
-                    <td>{item.price}</td>
-                    <td>{item.stock}</td>
-                    <td>{item.rating}</td>
-                    <td>{item.order}</td>
-                    <td>{item.sales}</td>
-                    <td>
-                      <div className="actions d-flex align-items-center">
-                        <Button color="secondary">
-                          <FaPencil />
-                        </Button>
-                        <Link to="/product/details">
-                          <Button color="success">
-                            <FaEye />
+                      </td>
+                      <td>
+                        <Rating
+                          name="read-only"
+                          defaultValue={item.rating}
+                          precision={0.5}
+                          size="small"
+                          readOnly
+                        />
+                      </td>
+                      <td>{item.isFeatured ? "Yes" : "No"}</td>
+                      <td>
+                        <div className="actions d-flex align-items-center">
+                          <Button color="secondary">
+                            <FaPencil />
                           </Button>
-                        </Link>
-                        <Button color="error">
-                          <MdDelete />
-                        </Button>
-                      </div>
+                          <Link to="/product/details">
+                            <Button color="success">
+                              <FaEye />
+                            </Button>
+                          </Link>
+                          <Button
+                            color="error"
+                            onClick={() => openDeleteDialog(item._id)} // Pass product ID to open delete dialog
+                          >
+                            <MdDelete />
+                          </Button>
+                          <Dialog
+                            open={confirmDelete}
+                            onClose={closeDeleteDialog}
+                          >
+                            <DialogTitle>Confirm Delete</DialogTitle>
+                            <DialogContent>
+                              Are you sure you want to delete this product?
+                            </DialogContent>
+                            <DialogActions>
+                              <Button
+                                onClick={closeDeleteDialog}
+                                color="primary"
+                              >
+                                Cancel
+                              </Button>
+                              <Button
+                                onClick={handleDeleteConfirm}
+                                color="error"
+                              >
+                                Confirm
+                              </Button>
+                            </DialogActions>
+                          </Dialog>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="12" className="text-center">
+                      No products available.
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
 
             <div className="d-flex tableFooter">
               <Pagination
-                count={Math.ceil(data.length / itemsPerPage)}
+                count={Math.ceil(productList.length / itemsPerPage)} // Change `data.length` to `productList.length`
                 page={currentPage}
                 onChange={handleChangePage}
                 color="primary"

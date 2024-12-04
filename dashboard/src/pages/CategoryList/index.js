@@ -106,6 +106,7 @@ const CategoryList = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [formFields, setFormFields] = useState({
     name: "",
+    description: "",
     images: "",
     color: "",
   });
@@ -122,12 +123,12 @@ const CategoryList = () => {
     setConfirmDelete(false); // Hide confirmation dialog
   };
   const handleDeleteConfirm = () => {
-    setIsLoading(true); // Show loading indicator during deletion
+    setIsLoading(true);
     deleteData(`/api/category/${deleteId}`)
       .then(() => {
         setCatData((prevData) =>
           prevData.filter((item) => item._id !== deleteId)
-        ); // Remove deleted category
+        );
         toast.success("Category deleted successfully!");
         setIsLoading(false);
         setConfirmDelete(false); // Close confirmation dialog
@@ -142,7 +143,7 @@ const CategoryList = () => {
     context.setisHideSidebarAndHeader(false);
     window.scrollTo(0, 0);
 
-    setIsLoading(true); // Show loading indicator
+    setIsLoading(true);
 
     fetchDataFromApi("/api/category").then((res) => {
       if (res) {
@@ -163,6 +164,7 @@ const CategoryList = () => {
   const editCat = (id) => {
     setFormFields({
       name: "",
+      description: "",
       images: "",
       color: "",
     });
@@ -172,6 +174,7 @@ const CategoryList = () => {
       if (res) {
         setFormFields({
           name: res.name,
+          description: res.description,
           images: res.images,
           color: res.color,
         });
@@ -279,6 +282,7 @@ const CategoryList = () => {
                   <th>CATEGORY</th>
                   <th>IMAGE</th>
                   <th>COLOR</th>
+                  <th>DESCRIPTION</th>
                   <th>ACTION</th>
                 </tr>
               </thead>
@@ -312,6 +316,7 @@ const CategoryList = () => {
                     <td style={{ backgroundColor: item.color }}>
                       {item.color}
                     </td>
+                    <td>{item.description}</td>
                     <td>
                       <div className="actions d-flex align-items-center">
                         <Button
@@ -369,6 +374,15 @@ const CategoryList = () => {
               label="Category Name"
               name="name"
               value={formFields.name}
+              onChange={inputChange}
+              fullWidth
+            />
+            <StyledTextField
+              autoFocus
+              margin="dense"
+              label="Description "
+              name="description"
+              value={formFields.description}
               onChange={inputChange}
               fullWidth
             />

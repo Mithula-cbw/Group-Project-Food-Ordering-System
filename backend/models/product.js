@@ -9,20 +9,14 @@ const productSchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  images: [
-    {
-      type: String,
-      required: true,
-    },
-  ],
-  type: {
-    type: String,
-    default: "",
-  },
   category: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Category",
     required: true,
+  },
+  type: {
+    type: String,
+    default: "",
   },
   price: {
     type: Number,
@@ -32,8 +26,12 @@ const productSchema = mongoose.Schema({
     type: Number,
     default: 0,
   },
+  isFeatured: {
+    type: Boolean,
+    default: false,
+  },
   countInStock: {
-    type: Number,
+    type: String,
     required: true,
   },
   discount: {
@@ -49,10 +47,12 @@ const productSchema = mongoose.Schema({
     type: Number,
     default: 0,
   },
-  isFeatured: {
-    type: Boolean,
-    default: false,
-  },
+  images: [
+    {
+      type: String,
+      required: true,
+    },
+  ],
   dateCreated: {
     type: Date,
     default: Date.now,

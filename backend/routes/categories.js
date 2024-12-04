@@ -47,9 +47,10 @@ router.post("/create", async (req, res) => {
     const limit = plimit(2); // Limit concurrent uploads to 2
 
     // Validate required fields
-    const { name, images, color } = req.body;
+    const { name, description, images, color } = req.body;
     if (
       !name ||
+      !description ||
       !images ||
       !Array.isArray(images) ||
       images.length === 0 ||
@@ -93,6 +94,7 @@ router.post("/create", async (req, res) => {
     // Create new category
     let category = new Category({
       name,
+      description,
       images: imgurl,
       color,
     });
@@ -154,6 +156,7 @@ router.put("/:id", async (req, res) => {
     req.params.id,
     {
       name: req.body.name,
+      description: req.body.description,
       icon: imgurl,
       color: req.body.color,
     },
