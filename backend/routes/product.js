@@ -9,12 +9,16 @@ const limit = plimit(2);
 
 // Helper function to upload images to Cloudinary
 async function uploadImages(images) {
-  const imageUploads = images.map((image) =>
-    limit(() => cloudinary.uploader.upload(image))
-  );
-
-  const results = await Promise.all(imageUploads);
-  return results.map((result) => result.secure_url);
+  try {
+    const imageUploads = images.map((image) =>
+      limit(() => cloudinary.uploader.upload(image))
+    );
+    const results = await Promise.all(imageUploads);
+    return results.map((result) => result.secure_url);
+  } catch (err) {
+    console.error("Error uploading images:", err);
+    throw new Error("Image upload failed.");
+  }
 }
 
 // Get all products with populated category
@@ -55,17 +59,16 @@ router.post(`/create`, async (req, res) => {
     let product = new Product({
       name: req.body.name,
       description: req.body.description,
-      images: imgurl,
+      category: req.body.category,
       type: req.body.type,
       price: req.body.price,
       oldPrice: req.body.oldPrice,
+      isFeatured: req.body.isFeatured,
+      countInStock: req.body.countInStock,
       discount: req.body.discount,
       size: req.body.size,
-      category: req.body.category,
-      countInStock: req.body.countInStock,
       rating: req.body.rating,
-      numReviews: req.body.numReviews,
-      isFeatured: req.body.isFeatured,
+      images: imgurl,
     });
 
     product = await product.save();
@@ -100,17 +103,16 @@ router.put("/:id", async (req, res) => {
       {
         name: req.body.name,
         description: req.body.description,
-        images: imgurl,
+        category: req.body.category,
         type: req.body.type,
         price: req.body.price,
         oldPrice: req.body.oldPrice,
+        isFeatured: req.body.isFeatured,
+        countInStock: req.body.countInStock,
         discount: req.body.discount,
         size: req.body.size,
-        category: req.body.category,
-        countInStock: req.body.countInStock,
         rating: req.body.rating,
-        numReviews: req.body.numReviews,
-        isFeatured: req.body.isFeatured,
+        images: imgurl,
       },
       { new: true }
     );

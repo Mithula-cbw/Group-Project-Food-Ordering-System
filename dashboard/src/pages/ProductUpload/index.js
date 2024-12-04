@@ -1,23 +1,25 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { emphasize, styled } from "@mui/material/styles";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import Chip from "@mui/material/Chip";
+import LoadingBar from "react-top-loading-bar";
+import DOMPurify from "dompurify";
 import HomeIcon from "@mui/icons-material/Home";
 import Box from "@mui/material/Box";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import FormControl from "@mui/material/FormControl";
+import CircularProgress from "@mui/material/CircularProgress";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import Rating from "@mui/material/Rating";
-import { Button } from "@mui/material";
+import { Button, LinearProgress } from "@mui/material";
 import { FaCloudArrowUp } from "react-icons/fa6";
-import { IoCloseSharp } from "react-icons/io5";
-import { LazyLoadImage } from "react-lazy-load-image-component";
-import { IoIosImages } from "react-icons/io";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { fetchDataFromApi, postData } from "../../utils/Api";
+import { Mycontext } from "../../App";
+import {} from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const StyledBreadcrumb = styled(Chip)(({ theme }) => {
   const backgroundColor =
@@ -41,46 +43,48 @@ const StyledBreadcrumb = styled(Chip)(({ theme }) => {
 });
 
 const ProductDetails = () => {
-  const [categoryVal, setCategoryVal] = useState("");
   const [typeVal, setTypeVal] = useState("");
-  const [featuredVal, setFeaturedVal] = useState("");
-  const [ratingValue, setRatingValue] = useState(1);
-  const [size, setSize] = useState("");
-  const [images, setImages] = useState([]);
+  const [featuredVal, setFeaturedVal] = useState(null);
+  const [productImagesArr, setproductImages] = useState([]);
+  const productImages = useRef();
+  const loadingBarRef = useRef("");
+  const [progress, setProgress] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [catData, setCatData] = useState([]);
+  const imagesArr = [];
+
+  const context = useContext(Mycontext);
   const [formFields, setFormFields] = useState({
     name: "",
     description: "",
-    price: "",
-    oldPrice: "",
-    color: "",
+    category: "",
+    type: "",
+    price: 0,
+    oldPrice: 0,
+    isFeatured: false,
     countInStock: "",
-    brand: "",
     discount: "",
+    size: "",
+    rating: 0,
+    images: [],
   });
-
-  const handleChangeCategory = (event) => {
-    setCategoryVal(event.target.value);
-  };
 
   const handleChangeType = (event) => {
     setTypeVal(event.target.value);
+    setFormFields((prevFields) => ({
+      ...prevFields,
+      type: event.target.value,
+    }));
   };
 
   const handleChangeFeatured = (event) => {
-    setFeaturedVal(event.target.value);
-  };
-
-  const handleChangeSize = (event) => {
-    setSize(event.target.value);
-  };
-
-  const handleImageUpload = (event) => {
-    const files = Array.from(event.target.files);
-    setImages((prevImages) => [...prevImages, ...files]);
-  };
-
-  const handleRemoveImage = (index) => {
-    setImages(images.filter((_, i) => i !== index));
+    const value = event.target.value;
+    setFeaturedVal(value);
+    setFormFields((prevFields) => ({
+      ...prevFields,
+      isFeatured: value === "true", // Convert to boolean
+    }));
   };
 
   const handleInputChange = (e) => {
@@ -90,53 +94,149 @@ const ProductDetails = () => {
       [name]: value,
     }));
   };
+  const validateForm = () => {
+    // Basic checks for empty fields
+    if (
+      !formFields.name ||
+      !formFields.description ||
+      !productImagesArr.length
+    ) {
+      toast.error("Please fill all the required fields!");
+      return false;
+    }
 
-  const submitForm = async (e) => {
+    // Check for malicious inputs (basic example for script tags)
+    const regex = /<script.*?>.*?<\/script>/gi;
+    if (regex.test(formFields.name) || regex.test(formFields.description)) {
+      toast.error("Invalid characters detected in the input!");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleRatingChange = (event, newValue) => {
+    setFormFields((prevFields) => ({
+      ...prevFields,
+      rating: newValue,
+    }));
+  };
+  const handleCategoryChange = (event) => {
+    setFormFields((prevFields) => ({
+      ...prevFields,
+      category: event.target.value,
+    }));
+  };
+
+  const handleSizeChange = (event) => {
+    setFormFields((prevFields) => ({
+      ...prevFields,
+      size: event.target.value,
+    }));
+  };
+
+  const addProductImage = () => {
+    const image = productImages.current.value;
+    if (image && isValidImageUrl(image)) {
+      setFormFields((prevFields) => ({
+        ...prevFields,
+        images: [...prevFields.images, image],
+      }));
+
+      setproductImages((prevImages) => [...prevImages, image]);
+
+      productImages.current.value = "";
+      toast.success("Image added successfully!");
+    } else {
+      toast.warning("Please enter a valid image URL");
+    }
+  };
+
+  const isValidImageUrl = (url) => {
+    return /^(ftp|http|https):\/\/[^ "]+(\.(jpg|jpeg|png|gif|bmp|webp))$/.test(
+      url
+    );
+  };
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    context.setisHideSidebarAndHeader(false);
+    window.scrollTo(0, 0);
+
+    loadingBarRef.current.continuousStart();
+
+    fetchDataFromApi("/api/category")
+      .then((res) => {
+        if (res) {
+          setCatData(res);
+        }
+      })
+      .finally(() => {
+        // Complete loading
+        loadingBarRef.current.complete();
+      });
+  }, [context]);
+
+  const isMounted = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
+
+  const addProduct = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
 
-    const formData = new FormData();
-    formData.append("name", formFields.name);
-    formData.append("description", formFields.description);
-    formData.append("price", formFields.price);
-    formData.append("oldPrice", formFields.oldPrice);
-    formData.append("color", formFields.color);
-    formData.append("countInStock", formFields.countInStock);
-    formData.append("brand", formFields.brand);
-    formData.append("discount", formFields.discount);
-    formData.append("category", categoryVal);
-    formData.append("type", typeVal);
-    formData.append("featured", featuredVal);
-    formData.append("size", size);
-    formData.append("rating", ratingValue);
-    images.forEach((image) => formData.append("images", image));
+    formFields.images = productImagesArr;
+
+    setIsLoading(true);
+    loadingBarRef.current.continuousStart();
+    setProgress(50);
 
     try {
-      await axios.post("http://localhost:4000/api/category/create", formData);
-      toast.success("Product uploaded successfully!", {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-    } catch (err) {
-      toast.error("Error uploading product!", {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
+      const res = await postData("/api/products/create", formFields);
+      if (res) {
+        toast.success("Product added successfully!");
+        setProgress(100);
+        loadingBarRef.current.complete();
+        navigate("/product/list");
+      } else {
+        toast.error("Failed to add product. Please try again.");
+      }
+    } catch (error) {
+      toast.error("An error occurred. Please try again.");
+      console.error("Error while adding product:", error);
+    } finally {
+      setProgress(100);
+      loadingBarRef.current.complete();
+      setIsLoading(false);
     }
   };
 
   return (
     <>
-      <ToastContainer />
+      <LoadingBar
+        color="#3446eb"
+        height={"4px"}
+        ref={loadingBarRef}
+        progress={progress}
+      />
+      <ToastContainer position="bottom-right" autoClose={3000} />
+      {isLoading && (
+        <Box
+          sx={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 1201, // Higher than most UI elements
+          }}
+        >
+          <LinearProgress />
+        </Box>
+      )}
       <div className="right-contentt w-100">
         <Box
           display="flex"
@@ -161,9 +261,9 @@ const ProductDetails = () => {
           </Breadcrumbs>
         </Box>
 
-        <form className="form mt-4 formform" onSubmit={submitForm}>
+        <form className="form mt-4 formform" onSubmit={addProduct}>
           <div className="row ml-3">
-            <div className="col-md-12 ml-3">
+            <div className="col-md-9 ml-3">
               <div className="card p-4 mt-0">
                 <h5 className="mb-4">Basic Information</h5>
 
@@ -195,8 +295,8 @@ const ProductDetails = () => {
                     <div className="form-group">
                       <h6>Category</h6>
                       <Select
-                        value={categoryVal}
-                        onChange={handleChangeCategory}
+                        value={formFields.category}
+                        onChange={handleCategoryChange}
                         displayEmpty
                         inputProps={{ "aria-label": "Without label" }}
                         className="w-100"
@@ -204,10 +304,14 @@ const ProductDetails = () => {
                         <MenuItem value="">
                           <em>None</em>
                         </MenuItem>
-                        <MenuItem value="Meal">Meal</MenuItem>
-                        <MenuItem value="Burgers">Burgers</MenuItem>
-                        <MenuItem value="Dessert">Dessert</MenuItem>
-                        <MenuItem value="Beverage">Beverage</MenuItem>
+                        {catData.length !== 0 &&
+                          catData?.map((cat, index) => {
+                            return (
+                              <MenuItem value={cat.id} key={index}>
+                                {cat.name}
+                              </MenuItem>
+                            );
+                          })}
                       </Select>
                     </div>
                   </div>
@@ -272,7 +376,7 @@ const ProductDetails = () => {
                         inputProps={{ "aria-label": "Without label" }}
                         className="w-100"
                       >
-                        <MenuItem value="">
+                        <MenuItem value={null}>
                           <em>None</em>
                         </MenuItem>
                         <MenuItem value="true">Yes</MenuItem>
@@ -289,7 +393,7 @@ const ProductDetails = () => {
                         name="countInStock"
                         value={formFields.countInStock}
                         onChange={handleInputChange}
-                        placeholder="Enter stock quantity"
+                        placeholder="Enter Availability"
                       />
                     </div>
                   </div>
@@ -313,8 +417,8 @@ const ProductDetails = () => {
                     <div className="form-group">
                       <h6>Size</h6>
                       <Select
-                        value={size}
-                        onChange={handleChangeSize}
+                        value={formFields.size}
+                        onChange={handleSizeChange}
                         displayEmpty
                         inputProps={{ "aria-label": "Without label" }}
                         className="w-100"
@@ -333,45 +437,27 @@ const ProductDetails = () => {
                       <h6>Rating</h6>
                       <Rating
                         name="rating"
-                        value={ratingValue}
-                        onChange={(event, newValue) => setRatingValue(newValue)}
+                        value={formFields.rating}
+                        onChange={handleRatingChange}
                       />
                     </div>
                   </div>
                 </div>
 
-                <div className="card p-4 mt-0">
-                  <div className="imageUploadSec">
-                    <h5 className="mb-4">Media And Published</h5>
-                    <div className="imgUploadBox d-flex align-items-center gap-3">
-                      {images.map((image, index) => (
-                        <div key={index} className="uploadBox">
-                          <span
-                            className="remove"
-                            onClick={() => handleRemoveImage(index)}
-                          >
-                            <IoCloseSharp />
-                          </span>
-                          <div className="box">
-                            <LazyLoadImage
-                              alt="uploaded-preview"
-                              effect="blur"
-                              src={URL.createObjectURL(image)}
-                              className="w-100"
-                            />
-                          </div>
-                        </div>
-                      ))}
-                      <div className="uploadBox">
+                <div class="row">
+                  <div class="col">
+                    <div className="form-group">
+                      <h6 className="text-uppercase">Product Images</h6>
+                      <div className="position-relative inputBtn">
                         <input
-                          type="file"
-                          multiple
-                          onChange={handleImageUpload}
+                          ref={productImages}
+                          type="text"
+                          style={{ paddingRight: "100px" }}
+                          placeholder="Enter image URL"
                         />
-                        <div className="info">
-                          <IoIosImages /> &nbsp;
-                          <h5>Upload Images</h5>
-                        </div>
+                        <Button className="btn-blue" onClick={addProductImage}>
+                          ADD
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -380,11 +466,37 @@ const ProductDetails = () => {
                 <Button
                   type="submit"
                   className="btn-blue btn-lg btn-big"
-                  onClick={submitForm}
                   variant="contained"
+                  disabled={isLoading}
                 >
-                  <FaCloudArrowUp /> &nbsp; Publish and View
+                  <FaCloudArrowUp /> &nbsp;
+                  {isLoading ? (
+                    <CircularProgress size={24} color="#ffffff" />
+                  ) : (
+                    "Publish and View"
+                  )}
                 </Button>
+              </div>
+            </div>
+
+            <div className="col-md-3">
+              <div className="stickybox">
+                {productImagesArr?.length !== 0 && (
+                  <h4 className="mt-3 mb-3" style={{ fontWeight: "700" }}>
+                    Product Images
+                  </h4>
+                )}
+
+                <div className="imgGrid d-flex">
+                  {productImagesArr?.length !== 0 &&
+                    productImagesArr?.map((item, index) => {
+                      return (
+                        <div className="img">
+                          <img src={item} alt="" />
+                        </div>
+                      );
+                    })}
+                </div>
               </div>
             </div>
           </div>

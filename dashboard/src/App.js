@@ -28,6 +28,7 @@ function App() {
   const [windowWidth, setwindowWidth] = useState(window.innerWidth);
   const [isOpenNav, setIsOpenNav] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [baseUrl, setBaseurl] = useState("http://localhost:4000");
 
   useEffect(() => {
     if (themeMode === true) {
@@ -68,6 +69,7 @@ function App() {
     setIsOpenNav,
     progress,
     setProgress,
+    baseUrl,
   };
 
   return (

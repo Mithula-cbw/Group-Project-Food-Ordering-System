@@ -1853,3 +1853,96 @@ button .loder {
   height: 4px !important;
   background: #1866ee !important;
 }
+.stickybox {
+  position: sticky;
+  top: 100px;
+}
+.imgGrid {
+  width: 100%;
+  flex-wrap: wrap;
+  gap: 10px;
+  position: sticky;
+  top: 119px !important;
+}
+.imgGrid .img {
+  width: 48%;
+  overflow: hidden;
+  border-radius: 7px;
+  height: 130px;
+}
+.imgGrid .img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.inputBtn button {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  z-index: 100;
+}
+.imgUploadBox {
+  width: 100%;
+  flex-wrap: nowrap;
+  gap: 10px;
+}
+
+.imgUploadBox .uploadBox {
+  width: 150px;
+  height: 150px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px dashed rgba(0, 0, 0, 0.2);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.imgUploadBox .uploadBox input {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+}
+
+.imgUploadBox .uploadBox .info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  pointer-events: none;
+}
+
+.imgUploadBox .uploadBox .info svg {
+  font-size: 50px;
+  opacity: 0.5;
+}
+
+.imgUploadBox .uploadBox .info h5 {
+  font-size: 15px;
+  text-align: center;
+  opacity: 0.5;
+}
+/* .boxxxx {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 0;
+  width: 100%;
+} */
+.flex-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.topic {
+  margin: 0;
+  padding: 0;
+}
+
+.breadcrumbs {
+  margin: 0;
+}
