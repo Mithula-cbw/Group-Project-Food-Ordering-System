@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ProductZoom from "../../Components/ProductZoom";
 import Rating from "@mui/material/Rating";
 import QuantityBox from "../../Components/QuantityDropDown";
@@ -8,13 +8,74 @@ import { FaRegHeart } from "react-icons/fa6";
 import { MdCompareArrows } from "react-icons/md";
 import Tooltip from "@mui/material/Tooltip";
 import RelatedProducts from "./RelatedProducts";
+import { useParams } from "react-router-dom";
+import { fetchDataFromApi } from "../../utils/Api";
 
 const ProductDetails = () => {
+  const [quantity, setQuantity] = useState(1);
   const [activeSize, setActiveSize] = useState(0);
   const [activeTabs, setActiveTabs] = useState(0);
+  const [productData, setProductData] = useState(null);
+  const [currentPrice, setCurrentPrice] = useState(0);
+  const { id } = useParams();
+  // useEffect(() => {
+  //   window.scrollTo(0, 0);
 
+  //   fetchDataFromApi(`/api/products/${id}`).then((res) => {
+  //     setProductData(res);
+  //     console.log(res);
+  //     setCurrentPrice(res.price); // Set initial price
+  //   });
+  // }, [id]); // Re-fetch when ID changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+
+    fetchDataFromApi(`/api/products/${id}`).then((res) => {
+      setProductData(res);
+      setCurrentPrice(res.price); // Set initial price
+
+      if (res) {
+        // Get existing recently viewed products from localStorage
+        let recentlyViewed =
+          JSON.parse(localStorage.getItem("recentlyViewed")) || [];
+
+        // Remove duplicate entries
+        recentlyViewed = recentlyViewed.filter((p) => p._id !== res._id);
+
+        // Add the new product at the beginning
+        recentlyViewed.unshift(res);
+
+        // Keep only the last 5 recently viewed products
+        if (recentlyViewed.length > 5) {
+          recentlyViewed.pop();
+        }
+
+        // Save back to localStorage
+        localStorage.setItem("recentlyViewed", JSON.stringify(recentlyViewed));
+      }
+    });
+  }, [id]); // Re-fetch when ID changes
+
+  if (!productData) {
+    return <div>Loading...</div>;
+  }
   const isActive = (index) => {
     setActiveSize(index);
+  };
+  const sizePriceIncrements = [0, 4, 6, 12]; // Example: Small (+$0), Medium (+$2), Large (+$4), Supreme (+$6)
+
+  const handleSizeChange = (index) => {
+    setActiveSize(index);
+    setCurrentPrice(
+      (productData.price + sizePriceIncrements[index]) * quantity
+    );
+  };
+
+  const handleQuantityChange = (newQuantity) => {
+    setQuantity(newQuantity);
+    setCurrentPrice(
+      (productData.price + sizePriceIncrements[activeSize]) * newQuantity
+    );
   };
 
   return (
@@ -23,22 +84,26 @@ const ProductDetails = () => {
         <div className="container">
           <div className="row">
             <div className="col-md-3 ml-5 pl-5">
-              <ProductZoom />
+              <ProductZoom
+                images={productData.images}
+                discount={productData.discount}
+              />
             </div>
             <div className="col-md-8 ml-4 pl-4 pr-4">
               <h2
                 className="hd ml-4 text-capitalize"
                 style={{ color: "black" }}
               >
-                BBQ Chicken Pizza - Family Favorite!
+                {productData.name}
               </h2>
+
               <ul className="list list-inline d-flex align-items-center">
                 <li className="list-inline-item">
                   <div className="d-flex align-items-center">
                     <span className="ml-4">Categories</span>
                     <span className="ml-1" style={{ color: "black" }}>
                       {" "}
-                      : Pizza, BBQ
+                      : {productData.catName}
                     </span>
                   </div>
                 </li>
@@ -46,66 +111,52 @@ const ProductDetails = () => {
                   <div className="d-flex align-items-center">
                     <Rating
                       name="read-only"
-                      value={4.5}
+                      value={Number(productData.rating)}
                       precision={0.5}
                       size="small"
                       readOnly
                     />
-                    <span className="text-light cursor ml-2">3 Reviews</span>
+                    <span className="text-light cursor ml-2">
+                      {Number(productData.rating)} Reviews
+                    </span>
                   </div>
                 </li>
               </ul>
 
               <div className="d-flex info mb-3 ml-4">
-                <span className="oldPrice">$25.00</span>
-                <span className="netPrice text-danger ml-2">$18.00</span>
+                <span className="oldPrice">${productData.oldPrice}</span>
+                <span className="netPrice text-danger ml-2">
+                  ${currentPrice}
+                </span>
               </div>
               <span className="badge badge-success ml-4">IN STOCK</span>
               <p className="mt-3 ml-4" style={{ color: "black" }}>
-                BBQ Chicken Pizza with tangy BBQ sauce, mozzarella, and juicy
-                chicken. A perfect meal for pizza lovers!
+                {productData.description}
               </p>
 
               <div className="productSize d-flex align-items-center">
                 <span>Size</span>
                 <ul className="list list-inline mb-0 pl-4">
-                  <li className="list-inline-item">
-                    <a
-                      className={`tag ${activeSize === 0 ? "active" : ""}`}
-                      onClick={() => setActiveSize(0)}
-                    >
-                      Small
-                    </a>
-                  </li>
-                  <li className="list-inline-item">
-                    <a
-                      className={`tag ${activeSize === 1 ? "active" : ""}`}
-                      onClick={() => setActiveSize(1)}
-                    >
-                      Medium
-                    </a>
-                  </li>
-                  <li className="list-inline-item">
-                    <a
-                      className={`tag ${activeSize === 2 ? "active" : ""}`}
-                      onClick={() => setActiveSize(2)}
-                    >
-                      Large
-                    </a>
-                  </li>
-                  <li className="list-inline-item">
-                    <a
-                      className={`tag ${activeSize === 3 ? "active" : ""}`}
-                      onClick={() => setActiveSize(3)}
-                    >
-                      Family Size
-                    </a>
-                  </li>
+                  {productData.size?.map((size, index) => (
+                    <li className="list-inline-item" key={index}>
+                      <a
+                        className={`tag ${
+                          activeSize === index ? "active" : ""
+                        }`}
+                        onClick={() => handleSizeChange(index)}
+                      >
+                        {size}
+                      </a>
+                    </li>
+                  ))}
                 </ul>
               </div>
 
               <div className="d-flex align-items-center ml-4 mt-3">
-                <QuantityBox />
+                <QuantityBox
+                  inputVal={quantity}
+                  setInputVal={handleQuantityChange}
+                />
                 <Button className="btn-blue btn-lg btn-big btn-round">
                   <FaCartShopping /> &nbsp; Add to cart
                 </Button>
@@ -170,11 +221,7 @@ const ProductDetails = () => {
               <br />
               {activeTabs === 0 && (
                 <div className="tabContent">
-                  <p>
-                    BBQ Chicken Pizza is crafted with a flavorful BBQ sauce,
-                    tender chicken pieces, onions, and a perfect blend of
-                    cheese. Ideal for sharing with family and friends.
-                  </p>
+                  <p>{productData.description} </p>
                 </div>
               )}
               {activeTabs === 1 && (
@@ -316,8 +363,13 @@ const ProductDetails = () => {
             </div>
           </div>
           <br />
-          <RelatedProducts title="RELATED MEALS" />
-          <RelatedProducts title="RECENTLY VIEWED PRODUCTS" />
+          <RelatedProducts
+            title="RELATED MEALS"
+            categoryName={productData.catName}
+            currentProductId={productData._id}
+            type="related"
+          />
+          <RelatedProducts title="RECENTLY VIEWED PRODUCTS" type="recent" />
         </div>
       </section>
     </div>
