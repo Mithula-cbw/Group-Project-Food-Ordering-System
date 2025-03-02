@@ -84,7 +84,7 @@ const Home = () => {
   const context = useContext(Mycontext);
   useEffect(() => {
     context.setisHideSidebarAndHeader(false);
-    window.scrollTo(0,0);
+    window.scrollTo(0, 0);
   }, []);
 
   const handleChange = (event) => {

@@ -4,7 +4,7 @@ import logo2 from "../../assets/images/thumbnail.png";
 const UserAvatar = (props) => {
   return (
     <div>
-      <div className={`userImg ${props.lg === true && 'lg'}`}>
+      <div className={`userImg ${props.lg === true && "lg"}`}>
         <span className="rounded-circle">
           <img
             src={props.img}

@@ -23,6 +23,21 @@ async function uploadImages(images) {
 
 // Get all products with populated category
 router.get(`/`, async (req, res) => {
+  const filterKey = req.query.product;
+  console.log(filterKey);
+  if (filterKey !== undefined) {
+    const productList = await Product.find({ isFeatured: false });
+    if (!productList) {
+      res.status(500).json({ success: false });
+    }
+    return res.status(200).json({
+      products: productList,
+    });
+  }
+  let productList = [];
+  if (req.query.catName !== undefined) {
+    productList = await Product.find({ catName: req.query.catName });
+  }
   try {
     const productList = await Product.find().populate("category");
     res.send(productList);
@@ -31,6 +46,16 @@ router.get(`/`, async (req, res) => {
       .status(500)
       .json({ success: false, message: "Failed to retrieve products." });
   }
+});
+
+//isfeatures finding
+
+router.get(`/featured`, async (req, res) => {
+  const productList = await Product.find({ isFeatured: true });
+  if (!productList) {
+    res.status(500).json({ success: false });
+  }
+  return res.status(200).json(productList);
 });
 
 // Get product by ID
@@ -60,6 +85,7 @@ router.post(`/create`, async (req, res) => {
       name: req.body.name,
       description: req.body.description,
       category: req.body.category,
+      catName: req.body.catName,
       type: req.body.type,
       price: req.body.price,
       oldPrice: req.body.oldPrice,
@@ -69,6 +95,7 @@ router.post(`/create`, async (req, res) => {
       size: req.body.size,
       rating: req.body.rating,
       images: imgurl,
+      productSize: req.body.productSize,
     });
 
     product = await product.save();
@@ -104,6 +131,7 @@ router.put("/:id", async (req, res) => {
         name: req.body.name,
         description: req.body.description,
         category: req.body.category,
+        catName: req.body.catName,
         type: req.body.type,
         price: req.body.price,
         oldPrice: req.body.oldPrice,
@@ -113,6 +141,7 @@ router.put("/:id", async (req, res) => {
         size: req.body.size,
         rating: req.body.rating,
         images: imgurl,
+        productSize: req.body.productSize,
       },
       { new: true }
     );
@@ -126,6 +155,16 @@ router.put("/:id", async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ message: "Error updating product." });
+  }
+});
+
+router.get("/api/products/count", async (req, res) => {
+  try {
+    const totalProducts = await Product.countDocuments(); // MongoDB query
+    res.json({ count: totalProducts });
+  } catch (error) {
+    console.error("Error fetching product count:", error);
+    res.status(500).json({ message: "Server Error" });
   }
 });
 

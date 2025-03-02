@@ -14,23 +14,166 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import AnimatedText from "./AnimatedText";
 import { IoHome } from "react-icons/io5";
+import { postData } from "../../utils/Api";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
 
 const SignUp = () => {
   const [inputIndex, setInputIndex] = useState(null);
   const [isShowPassword, setisShowPassword] = useState(false);
   const [isShowConfirmPassword, setisShowConfirmPassword] = useState(false);
-
+  const [formFields, setFormFields] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    password: "",
+    confirmPassword: "",
+    isAdmin: true,
+  });
   const context = useContext(Mycontext);
   useEffect(() => {
     context.setisHideSidebarAndHeader(true);
     window.scrollTo(0, 0);
   }, []);
-
+  const history = useNavigate();
   const focusInput = (index) => {
     setInputIndex(index);
   };
+  const onchangeInput = (e) => {
+    setFormFields(() => ({
+      ...formFields,
+      [e.target.name]: e.target.value,
+    }));
+  };
+  // const signUp = (e) => {
+  //   e.preventDefault();
+  //   if (formFields.name === "") {
+  //     context.setAlertBox({
+  //       open: true,
+  //       error: true,
+  //       msg: "Name Can Not Be Blank!...",
+  //     });
+  //     return false;
+  //   }
+  //   if (formFields.email === "") {
+  //     context.setAlertBox({
+  //       open: true,
+  //       error: true,
+  //       msg: "Email Can Not Be Blank!...",
+  //     });
+  //     return false;
+  //   }
+  //   if (formFields.phone === "") {
+  //     context.setAlertBox({
+  //       open: true,
+  //       error: true,
+  //       msg: "Phone Can Not Be Blank!...",
+  //     });
+  //     return false;
+  //   }
+  //   if (formFields.password === "") {
+  //     context.setAlertBox({
+  //       open: true,
+  //       error: true,
+  //       msg: "Password Can Not Be Blank!...",
+  //     });
+  //     return false;
+  //   }
+  //   if (formFields.confirmPassword === "") {
+  //     context.setAlertBox({
+  //       open: true,
+  //       error: true,
+  //       msg: "Confirm Password Can Not Be Blank!...",
+  //     });
+  //     return false;
+  //   }
+  //   if (formFields.confirmPassword !== formFields.password) {
+  //     context.setAlertBox({
+  //       open: true,
+  //       error: true,
+  //       msg: "Passowrd Not Match!...",
+  //     });
+  //     return false;
+  //   }
+  //   postData("/api/user/signup", formFields).then((res) => {
+  //     console.log(res);
+  //   });
+  // };
+  const signUp = (e) => {
+    e.preventDefault();
+
+    try {
+      if (formFields.name === "") {
+        console.log("error");
+        toast.error("🚨 Name cannot be blank!", { theme: "colored" });
+        return;
+      }
+      if (formFields.email === "") {
+        toast.error("📧 Email cannot be blank!", { theme: "colored" });
+        return;
+      }
+      if (formFields.phone === "") {
+        toast.error("📱 Phone number is required!", { theme: "colored" });
+        return;
+      }
+      if (formFields.password === "") {
+        toast.error("🔒 Password cannot be blank!", { theme: "colored" });
+        return;
+      }
+      if (formFields.confirmPassword === "") {
+        toast.error("🔁 Confirm Password is required!", { theme: "colored" });
+        return;
+      }
+      if (formFields.confirmPassword !== formFields.password) {
+        toast.error("❌ Passwords do not match!", { theme: "colored" });
+        return;
+      }
+
+      postData("/api/user/signup", formFields)
+        .then((res) => {
+          console.log("Signup Response:", res); // Debugging log
+
+          if (res && res.status === false) {
+            // 🛑 User already exists
+            toast.error("⚠️ User already exists! Try logging in.", {
+              theme: "colored",
+            });
+            return;
+          }
+
+          if (res) {
+            // ✅ Signup successful
+            toast.success("✅ Account created successfully!", {
+              theme: "colored",
+            });
+
+            setTimeout(() => {
+              history("/login");
+            }, 2000);
+          } else {
+            // ❌ General error
+            toast.error("⚠️ User already exists! Try logging in.", {
+              theme: "colored",
+            });
+          }
+        })
+        .catch((error) => {
+          console.error("Signup error:", error);
+          toast.error("⚠️ User already exists! Try logging in.", {
+            theme: "colored",
+          });
+        });
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      toast.error("❌ Unexpected error occurred!", { theme: "colored" });
+    }
+  };
+
   return (
     <>
+      <ToastContainer position="bottom-left" autoClose={3000} />
+
       <img
         src="https://dashboard-ecommerce-react.netlify.app/static/media/pattern.df9a7a28fc13484d1013.webp"
         alt=""
@@ -69,7 +212,7 @@ const SignUp = () => {
                 </h3>
               </div>
               <div className="wrapper mt-3 card border">
-                <form>
+                <form onSubmit={signUp}>
                   <div
                     className={`form-group mb-3 position-relative ${
                       inputIndex === 0 && "focus"
@@ -85,6 +228,8 @@ const SignUp = () => {
                       onFocus={() => focusInput(0)}
                       onBlur={() => setInputIndex(null)}
                       autoFocus
+                      name="name"
+                      onChange={onchangeInput}
                     />
                   </div>
                   <div
@@ -101,11 +246,31 @@ const SignUp = () => {
                       placeholder="Enter your Email"
                       onFocus={() => focusInput(1)}
                       onBlur={() => setInputIndex(null)}
+                      name="email"
+                      onChange={onchangeInput}
                     />
                   </div>
                   <div
                     className={`form-group mb-3 position-relative ${
                       inputIndex === 2 && "focus"
+                    }`}
+                  >
+                    <span className="icon">
+                      <MdEmail />
+                    </span>
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Enter your Phone"
+                      onFocus={() => focusInput(2)}
+                      onBlur={() => setInputIndex(null)}
+                      name="phone"
+                      onChange={onchangeInput}
+                    />
+                  </div>
+                  <div
+                    className={`form-group mb-3 position-relative ${
+                      inputIndex === 3 && "focus"
                     }`}
                   >
                     <span className="icon">
@@ -115,8 +280,10 @@ const SignUp = () => {
                       type={`${isShowPassword === true ? "text" : "password"}`}
                       className="form-control"
                       placeholder="Enter your Password"
-                      onFocus={() => focusInput(2)}
+                      onFocus={() => focusInput(3)}
                       onBlur={() => setInputIndex(null)}
+                      name="password"
+                      onChange={onchangeInput}
                     />
                     <span
                       className="toglleShowPassword"
@@ -127,7 +294,7 @@ const SignUp = () => {
                   </div>
                   <div
                     className={`form-group mb-4 position-relative ${
-                      inputIndex === 3 && "focus"
+                      inputIndex === 4 && "focus"
                     }`}
                   >
                     <span className="icon">
@@ -139,8 +306,10 @@ const SignUp = () => {
                       }`}
                       className="form-control"
                       placeholder="Confirm your Password"
-                      onFocus={() => focusInput(3)}
+                      // onFocus={() => focusInput(4)}
                       onBlur={() => setInputIndex(null)}
+                      name="confirmPassword"
+                      onChange={onchangeInput}
                     />
                     <span
                       className="toglleShowPassword"
@@ -161,7 +330,10 @@ const SignUp = () => {
                     className=""
                   />
                   <div className="form-group">
-                    <Button className="btn-blue btn-lg btn-big w-100">
+                    <Button
+                      type="submit"
+                      className="btn-blue btn-lg btn-big w-100"
+                    >
                       Sign Up
                     </Button>
                   </div>
