@@ -168,7 +168,7 @@ const Footer = () => {
                 <FaInstagramSquare />
               </Link>
             </li>
-          </ul> 
+          </ul>
         </div>
       </div>
     </footer>

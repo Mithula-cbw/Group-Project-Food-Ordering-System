@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
 import { Box } from "@mui/material";
-import { SearchOff } from "@mui/icons-material";
+import { CheckCircle } from "@mui/icons-material";
 
-const NoProductsFound = () => {
+const Paymentsuccess = () => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -34,10 +34,10 @@ const NoProductsFound = () => {
           animate={{ scale: 1 }}
           transition={{ type: "spring", stiffness: 120, damping: 10 }}
         >
-          <SearchOff
+          <CheckCircle
             sx={{
               fontSize: "60px",
-              color: "#ff6b6b", // Beautiful red shade
+              color: "#28a745", // Green color to indicate success
               marginBottom: "10px",
             }}
           />
@@ -50,10 +50,10 @@ const NoProductsFound = () => {
           style={{
             fontSize: "18px",
             fontWeight: "bold",
-            color: "#800000",
+            color: "#2d2d2d", // Darker color for the text
           }}
         >
-          Oops! No products found in this category.
+          Payment Successful! 🎉
         </motion.p>
         <motion.p
           initial={{ opacity: 0 }}
@@ -61,13 +61,14 @@ const NoProductsFound = () => {
           transition={{ delay: 0.3, duration: 1 }}
           style={{
             fontSize: "14px",
-            color: "#806600",
+            color: "#3c763d", // Greenish color for secondary text
           }}
         >
-          Try selecting another category.
+          Thank you for your purchase. You can now proceed to your orders.
         </motion.p>
       </Box>
     </motion.div>
   );
 };
-export default NoProductsFound;
+
+export default Paymentsuccess;
