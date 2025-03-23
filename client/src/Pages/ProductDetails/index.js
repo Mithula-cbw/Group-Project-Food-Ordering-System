@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import ProductZoom from "../../Components/ProductZoom";
 import Rating from "@mui/material/Rating";
 import QuantityBox from "../../Components/QuantityDropDown";
@@ -9,15 +9,33 @@ import { MdCompareArrows } from "react-icons/md";
 import Tooltip from "@mui/material/Tooltip";
 import RelatedProducts from "./RelatedProducts";
 import { useParams } from "react-router-dom";
-import { fetchDataFromApi } from "../../utils/Api";
+import { fetchDataFromApi, postData } from "../../utils/Api";
+import { Mycontext } from "../../App";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Reviews } from "@mui/icons-material";
 
 const ProductDetails = () => {
+  const [reviewData, setReviewData] = useState([]);
+  const [reviews, setReviews] = useState({
+    productId: "",
+    customerName: "",
+    customerId: "",
+    review: "",
+    customerRating: 1, // Default to 1 to avoid empty value issues
+  });
+  const context = useContext(Mycontext);
   const [quantity, setQuantity] = useState(1);
   const [activeSize, setActiveSize] = useState(0);
   const [activeTabs, setActiveTabs] = useState(0);
   const [productData, setProductData] = useState(null);
   const [currentPrice, setCurrentPrice] = useState(0);
+  const [addingCart, setaddingCart] = useState(false);
+  const [cartFields, setCartFields] = useState({});
+  const [reviewList, setReviewList] = useState();
+  const [loading, setLoaing] = useState(false);
   const { id } = useParams();
+
   // useEffect(() => {
   //   window.scrollTo(0, 0);
 
@@ -54,6 +72,10 @@ const ProductDetails = () => {
         localStorage.setItem("recentlyViewed", JSON.stringify(recentlyViewed));
       }
     });
+    fetchDataFromApi(`/api/productReviews?productId=${id}`).then((res) => {
+      console.log(res);
+      setReviewData(res);
+    });
   }, [id]); // Re-fetch when ID changes
 
   if (!productData) {
@@ -78,8 +100,203 @@ const ProductDetails = () => {
     );
   };
 
+  const addtoCart = () => {
+    if (activeSize !== null) {
+      let user = JSON.parse(localStorage.getItem("user"));
+
+      // If no user is logged in, generate an anonymous ID
+      if (!user) {
+        user = { id: `anonymous-${Date.now()}` }; // Create an anonymous ID using the timestamp
+        localStorage.setItem("user", JSON.stringify(user)); // Optionally save it in localStorage for future use
+      }
+
+      // Now use the user ID (either logged in or anonymous)
+      cartFields.productTitle = productData?.name;
+      cartFields.images = productData?.images[0];
+      cartFields.rating = productData?.rating;
+      cartFields.price = productData?.price;
+      cartFields.quantity = quantity;
+      cartFields.subTotal = currentPrice;
+      cartFields.productId = productData?._id;
+      cartFields.userId = user.id; // Use either logged-in or anonymous user ID
+      cartFields.size = productData?.size[activeSize];
+
+      context.addtoCart(cartFields);
+    } else {
+      toast.error("❌ Please Select a Size!", {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        style: {
+          backgroundColor: "#dc3545",
+          color: "#fff",
+          fontSize: "16px",
+          fontWeight: "bold",
+          borderRadius: "8px",
+          padding: "10px 15px",
+        },
+        icon: "⚠️",
+      });
+    }
+  };
+
+  const onchangeInput = (e) => {
+    setReviews((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const changeRating = (e) => {
+    setReviews((prev) => ({
+      ...prev,
+      customerRating: e.target.value,
+    }));
+  };
+  // const addReview = (e) => {
+  //   e.preventDefault();
+  //   const formData = new FormData();
+  //   const user = JSON.stringify(localStorage.getItem("user"));
+  //   console.log(Reviews);
+  //   setReviews(() => ({
+  //     ...reviews,
+  //     productId: id,
+  //     customerId: user?._id,
+  //   }));
+
+  //   // formData.append("productId", id);
+  //   // formData.append("customerName", user?.name);
+  //   // formData.append("customerId", user?._id);
+  //   // formData.append("review", reviews?.review);
+  //   // formData.append("customerRating", reviews?.customerRating);
+
+  //   // postData("api/productReviews/add", formData).then((res) => {
+  //   //   console.log(res);
+  //   // });
+  // };
+  const addReview = (e) => {
+    e.preventDefault();
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    // Check if user is logged in and has a userId
+    if (!user || !user._id) {
+      toast.error("❌ Please log in to submit your review!", {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        style: {
+          backgroundColor: "#dc3545",
+          color: "#fff",
+          fontSize: "16px",
+          fontWeight: "bold",
+          borderRadius: "8px",
+          padding: "10px 15px",
+        },
+        icon: "⚠️",
+      });
+      return; // Exit the function if the user is not logged in
+    }
+
+    const reviewData = {
+      ...reviews,
+      productId: id,
+      customerId: user?._id,
+      customerName: user?.name,
+    };
+
+    setLoaing(true);
+
+    // Optimistic UI update
+    setReviewData((prevReviews) => [
+      ...prevReviews,
+      { ...reviewData, _id: new Date().getTime(), createdAt: new Date() }, // Temporary data
+    ]);
+
+    postData("/api/productReviews/add", reviewData).then((res) => {
+      setReviews({
+        productId: "",
+        customerName: "",
+        customerId: "",
+        review: "",
+        customerRating: "1",
+      });
+      setTimeout(() => {
+        setLoaing(false);
+      }, 1000);
+    });
+  };
+
+  const addToMyList = async (id) => {
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    if (!user) {
+      toast.error("Please log in to add items to your wishlist!", {
+        position: "bottom-right",
+        autoClose: 2000,
+      });
+      return;
+    }
+
+    try {
+      // Wait for the API response
+      const myListData = await fetchDataFromApi("/api/myList/");
+
+      // Check if the item is already in the wishlist
+      const isAlreadyInWishlist = myListData.some(
+        (item) => item.productId === id
+      );
+
+      if (isAlreadyInWishlist) {
+        toast.info("This item is already in your wishlist! ❤️", {
+          position: "bottom-right",
+          autoClose: 2000,
+        });
+        return; // Stop execution if the item is already in the wishlist
+      }
+
+      const data = {
+        productTitle: productData.name,
+        images: productData.images[0],
+        rating: Number(productData.rating),
+        price: currentPrice,
+        productId: id,
+        userId: user?._id,
+      };
+
+      // Add item to wishlist
+      const res = await postData("/api/myList/add/", data);
+
+      if (res) {
+        toast.success("Item added to wishlist! ❤️", {
+          position: "bottom-right",
+          autoClose: 2000,
+          theme: "colored",
+        });
+      } else {
+        toast.error("Failed to add item. Try again!", {
+          position: "bottom-right",
+          autoClose: 2000,
+        });
+      }
+    } catch (error) {
+      toast.error("Something went wrong!", {
+        position: "bottom-right",
+        autoClose: 2000,
+      });
+    }
+  };
+
   return (
     <div>
+      <ToastContainer position="bottom-right" autoClose={2000} />
       <section className="productDetails section">
         <div className="container">
           <div className="row">
@@ -157,12 +374,16 @@ const ProductDetails = () => {
                   inputVal={quantity}
                   setInputVal={handleQuantityChange}
                 />
-                <Button className="btn-blue btn-lg btn-big btn-round">
+                <Button
+                  className="btn-blue btn-lg btn-big btn-round"
+                  onClick={addtoCart}
+                >
                   <FaCartShopping /> &nbsp; Add to cart
                 </Button>
 
                 <Tooltip title="Add to WishList" placement="top">
                   <Button
+                    onClick={() => addToMyList(productData?._id)}
                     className="btn-blue btn-lg btn-big btn-circle ml-4"
                     style={{ fontSize: "17px" }}
                   >
@@ -214,7 +435,7 @@ const ProductDetails = () => {
                       setActiveTabs(2);
                     }}
                   >
-                    Reviews (3)
+                    Reviews ({reviewData.length})
                   </Button>
                 </li>
               </ul>
@@ -262,51 +483,90 @@ const ProductDetails = () => {
                     <div className="col-md-10">
                       <h3>Customer question & answers</h3>
                       <br />
-                      <div className="card p-4 reviewCard flex-row">
-                        <div className="image">
-                          <div className="rounded-circle">
-                            <img
-                              src="https://static.vecteezy.com/system/resources/thumbnails/037/098/807/small_2x/ai-generated-a-happy-smiling-professional-man-light-blurry-office-background-closeup-view-photo.jpg"
-                              alt=""
+                      <div className="review-section">
+                        <h3
+                          className="text-dark mb-4 text-center"
+                          style={{ fontWeight: "bold" }}
+                        >
+                          Customer Reviews
+                        </h3>
+                        {reviewData.length > 0 ? (
+                          reviewData.map((review, index) => (
+                            <div
+                              key={index}
+                              className="card p-4 reviewCard flex-row mb-4"
                               style={{
-                                height: "100px",
-                                width: "100px",
-                                borderRadius: "50%",
+                                borderRadius: "12px",
+                                boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
+                                backgroundColor: "#fff5f7",
+                                border: "1px solid #ffccd5",
                               }}
-                            />
-                          </div>
-                          <span className="text-g d-block text-center font-weight-bold">
-                            dasun
-                          </span>
-                        </div>
+                            >
+                              {/* Avatar Section */}
+                              <div className="image">
+                                <div
+                                  className="rounded-circle d-flex align-items-center justify-content-center"
+                                  style={{
+                                    height: "80px",
+                                    width: "80px",
+                                    borderRadius: "50%",
+                                    backgroundColor: "#ff5a80",
+                                    color: "#fff",
+                                    fontSize: "28px",
+                                    fontWeight: "bold",
+                                    textTransform: "uppercase",
+                                    boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
+                                  }}
+                                >
+                                  {review.customerName.charAt(0)}
+                                </div>
+                                <span
+                                  className="text-dark d-block text-center font-weight-bold mt-2"
+                                  style={{ fontSize: "14px" }}
+                                >
+                                  {review.customerName}
+                                </span>
+                              </div>
 
-                        <div className="info pl-5">
-                          <div className="d-flex align-items-center w-100">
-                            <h5 className="text-light">2024/10/10</h5>
-                            <div className="ml-auto">
-                              <Rating
-                                name="half-rating-read"
-                                value={4.5}
-                                precision={0.5}
-                                readOnly
-                                size="small"
-                              />
+                              {/* Review Content */}
+                              <div className="info pl-4" style={{ flex: "1" }}>
+                                <div className="d-flex align-items-center w-100 mb-2">
+                                  <h5
+                                    className="text-dark m-0"
+                                    style={{ fontSize: "14px" }}
+                                  >
+                                    {new Date().toISOString().split("T")[0]}
+                                  </h5>
+                                  <div className="ml-auto">
+                                    <Rating
+                                      name={`rating-${index}`}
+                                      value={review.customerRating}
+                                      precision={0.5}
+                                      readOnly
+                                      size="small"
+                                    />
+                                  </div>
+                                </div>
+                                <p
+                                  style={{
+                                    color: "#333",
+                                    fontSize: "15px",
+                                    lineHeight: "1.6",
+                                    backgroundColor: "#ffe6ea",
+                                    padding: "10px",
+                                    borderRadius: "8px",
+                                  }}
+                                >
+                                  {review.review}
+                                </p>
+                              </div>
                             </div>
-                          </div>
-                          <p>
-                            Morbi vitae erat auctor, eleifend nunc a, lobortis
-                            neque. Praesent aliquam dignissim viverra. Maecenas
-                            lacus odio, feugiat eu nunc sit amet, maximus
-                            sagittis dolor. Vivamus nisi sapien, elementum sit
-                            amet eros sit amet, ultricies cursus ipsum. Sed
-                            consequat luctus ligula. Curabitur laoreet rhoncus
-                            blandit. Aenean vel diam ut arcu pharetra dignissim
-                            ut sed leo. Vivamus faucibus, ipsum in vestibulum
-                            vulputate, lorem orci convallis quam, sit amet
-                            consequat nulla felis pharetra lacus. Duis semper
-                            erat mauris, sed egestas purus commodo vel.
+                          ))
+                        ) : (
+                          <p className="text-center text-dark">
+                            No reviews yet. Be the first to review!
                           </p>
-                        </div>
+                        )}
                       </div>
                     </div>
 
@@ -315,7 +575,7 @@ const ProductDetails = () => {
                     <br />
                     <br />
                     <div className="col-md-10">
-                      <form className="reviewForm">
+                      <form className="reviewForm" onSubmit={addReview}>
                         <h4 className="mt-4">Add a review</h4>
 
                         <div className="form-group">
@@ -323,25 +583,30 @@ const ProductDetails = () => {
                             className="form-control"
                             placeholder="Write a Review"
                             name="review"
+                            onChange={onchangeInput}
+                            value={reviews.review}
                           ></textarea>
                         </div>
                         <div className="row">
-                          <div className="col-md-5">
+                          {/* <div className="col-md-5">
                             <div className="form-group">
                               <input
                                 type="text"
                                 className="form-control"
                                 placeholder="Name"
-                                name="userName"
+                                name="customerName"
+                                onChange={onchangeInput}
+                                value={reviews.customerName}
                               />
                             </div>
-                          </div>
+                          </div> */}
                           <div className="col-md-6">
                             <div className="form-group">
                               <Rating
-                                name="rating"
-                                value={4.5}
+                                name="customerRating"
+                                value={reviews.customerRating}
                                 precision={0.5}
+                                onChange={changeRating}
                               />
                             </div>
                           </div>
@@ -372,6 +637,7 @@ const ProductDetails = () => {
           <RelatedProducts title="RECENTLY VIEWED PRODUCTS" type="recent" />
         </div>
       </section>
+      {loading === true && <div className="loading"></div>}
     </div>
   );
 };
