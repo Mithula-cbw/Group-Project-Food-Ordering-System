@@ -1433,7 +1433,7 @@ button {
 }
 .productListing1 {
   display: flex;
-  gap: 20px;
+  gap: 10px;
   flex-wrap: wrap; /* Prevent wrapping to the next line */
   /* overflow-x: auto;  */
 }
@@ -1458,7 +1458,7 @@ button {
 .productListing1 {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 10px;
 }
 
 .productListing1 .productItem.one {
@@ -1550,7 +1550,7 @@ button {
 .productListing1 {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 10px;
   transition: all 0.4s ease-in-out; /* Smooth transition */
 }
 
@@ -2209,4 +2209,340 @@ a:hover {
   font-size: 12px;
   color: #000;
   opacity: 0.7;
+}
+.loading {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  z-index: 10000;
+  cursor: wait;
+  background: rgba(255, 255, 255, 0.5);
+}
+.empty-cart {
+  text-align: center;
+  padding: 30px;
+}
+
+.empty-cart-img {
+  width: 180px;
+  margin-bottom: 15px;
+  animation: floatUp 1.5s infinite alternate ease-in-out;
+}
+
+@keyframes floatUp {
+  from {
+    transform: translateY(0px);
+  }
+  to {
+    transform: translateY(-10px);
+  }
+}
+
+.empty-cart h4 {
+  font-size: 22px;
+  font-weight: bold;
+  color: #722222;
+  margin-bottom: 10px;
+}
+
+.empty-cart p {
+  font-size: 16px;
+  color: #555;
+}
+
+.empty-cart .btn {
+  background-color: #ff4500;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  color: white;
+  transition: 0.3s;
+}
+
+.empty-cart .btn:hover {
+  background-color: #e03e00;
+}
+.empty-cart {
+  text-align: center;
+  padding: 40px 0;
+}
+
+.empty-cart-img {
+  max-width: 250px; /* Adjust size */
+  width: 100%;
+  margin: 0 auto; /* Center horizontally */
+  display: block;
+}
+
+.empty-cart h4 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-top: 10px;
+  color: #333;
+}
+
+.empty-cart p {
+  font-size: 16px;
+  color: #666;
+}
+
+.empty-cart .btn {
+  margin-top: 15px;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 8px;
+}
+.wishlist-container {
+  padding: 40px;
+  max-width: 1200px;
+  margin: auto;
+  text-align: center;
+}
+
+.wishlist-title {
+  font-size: 2rem;
+  color: #d72638;
+  font-weight: bold;
+  margin-bottom: 10px;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.wishlist-subtitle {
+  color: #555;
+  font-size: 1rem;
+  margin-bottom: 20px;
+}
+
+.wishlist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  justify-content: center;
+}
+
+.wishlist-item {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s;
+  animation: fadeInUp 0.5s ease-in-out;
+}
+
+.wishlist-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.wishlist-img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+.wishlist-info {
+  padding: 15px;
+}
+
+.wishlist-product-name {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.wishlist-product-price {
+  font-size: 1rem;
+  color: #d72638;
+  margin-top: 5px;
+}
+
+.wishlist-remove-btn {
+  background: #d72638;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background 0.3s ease;
+}
+
+.wishlist-remove-btn:hover {
+  background: #a11d29;
+}
+
+.empty-wishlist {
+  text-align: center;
+  margin-top: 50px;
+}
+
+.empty-wishlist img {
+  width: 200px;
+  margin-bottom: 10px;
+  animation: bounce 1.5s infinite;
+}
+
+.empty-wishlist h4 {
+  font-size: 1.5rem;
+  color: #555;
+}
+
+.empty-wishlist p {
+  color: #777;
+}
+
+.empty-wishlist .btn-primary {
+  background: #d72638;
+  padding: 10px 15px;
+  border-radius: 8px;
+  transition: background 0.3s;
+}
+
+.empty-wishlist .btn-primary:hover {
+  background: #a11d29;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+.wishlist-image-container {
+  width: 100%;
+  height: 180px; /* Adjust as needed */
+  overflow: hidden;
+}
+
+.wishlist-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures images fit properly without distortion */
+}
+/* Contact Page Container */
+.dashboard-container {
+  max-width: 800px;
+  margin: 50px auto;
+  padding: 30px;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transform: scale(1);
+  transition: transform 0.3s ease;
+}
+
+.dashboard-container:hover {
+  transform: scale(1.03);
+}
+
+/* Page Title */
+.page-title {
+  text-align: center;
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+/* Contact Form Styling */
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Label Styling */
+.contact-form label {
+  font-weight: 600;
+  color: #444;
+  font-size: 1rem;
+}
+
+/* Input & Textarea Styling */
+.contact-form input,
+.contact-form textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease-in-out;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+  border-color: #ff6600;
+  outline: none;
+  box-shadow: 0 0 8px rgba(255, 102, 0, 0.3);
+}
+
+.contact-form textarea {
+  resize: none;
+  height: 120px;
+}
+
+/* Button Styling */
+.contact-form button {
+  background: #ff6600;
+  color: white;
+  padding: 12px;
+  font-size: 1.2rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.contact-form button:hover {
+  background: #ff4500;
+  transform: scale(1.05);
+}
+
+/* Smooth Scroll Effect */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .dashboard-container {
+    max-width: 90%;
+    padding: 20px;
+  }
+
+  .page-title {
+    font-size: 2rem;
+  }
+
+  .contact-form button {
+    font-size: 1rem;
+  }
 }
