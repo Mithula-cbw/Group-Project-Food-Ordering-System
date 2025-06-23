@@ -13,7 +13,7 @@ import { Rating } from "@mui/material";
 import { IoMdHeartEmpty } from "react-icons/io";
 import ProductModel from "../ProductModal";
 import { Link } from "react-router-dom";
-import { Mycontext } from "../../App";
+import { Mycontext } from "../../context/MyContext";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { fetchDataFromApi, postData } from "../../utils/Api";

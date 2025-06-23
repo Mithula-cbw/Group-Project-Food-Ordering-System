@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import Rating from "@mui/material/Rating";
 import QuantityBox from "../../Components/QuantityDropDown";
 import { MdDelete } from "react-icons/md";
-import { Mycontext } from "../../App";
+import { Mycontext } from "../../context/MyContext";
 import { deleteData, editData, fetchDataFromApi } from "../../utils/Api";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";

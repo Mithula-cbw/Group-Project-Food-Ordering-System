@@ -10,7 +10,7 @@ import Tooltip from "@mui/material/Tooltip";
 import RelatedProducts from "./RelatedProducts";
 import { useParams } from "react-router-dom";
 import { fetchDataFromApi, postData } from "../../utils/Api";
-import { Mycontext } from "../../App";
+import { Mycontext } from "../../context/MyContext";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Reviews } from "@mui/icons-material";

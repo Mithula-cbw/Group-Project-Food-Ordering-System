@@ -8,7 +8,7 @@ import { FaHeart } from "react-icons/fa6";
 import { MdCompareArrows } from "react-icons/md";
 import ProductZoom from "../ProductZoom";
 import { useContext, useEffect, useState } from "react";
-import { Mycontext } from "../../App";
+import { Mycontext } from "../../context/MyContext";
 import { fetchDataFromApi, postData } from "../../utils/Api";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";

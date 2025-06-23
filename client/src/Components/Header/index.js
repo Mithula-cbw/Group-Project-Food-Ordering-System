@@ -9,7 +9,7 @@ import SearchBox from "./SearchBox";
 import Avatar from "@mui/material/Avatar";
 import Navigation from "./Navigation";
 import { useContext, useEffect, useState } from "react";
-import { Mycontext } from "../../App";
+import { Mycontext } from "../../context/MyContext";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Menu, MenuItem, ListItemIcon, Divider } from "@mui/material";
@@ -23,7 +23,7 @@ import { AiOutlineHeart } from "react-icons/ai";
 const Header = () => {
   const [mylistdata, setmylistdata] = useState();
   const [accountAnchorEl, setAccountAnchorEl] = useState(null);
-  const context = useContext(Mycontext);
+  const { cartdata, isLogin, user, countrList } = useContext(Mycontext);
   const navigate = useNavigate();
   const handleAccountMenu = (event) => {
     setAccountAnchorEl(event.currentTarget);
@@ -53,11 +53,11 @@ const Header = () => {
   };
 
   const calculateSubtotal = () => {
-    if (!Array.isArray(context.cartdata) || context.cartdata.length === 0) {
+    if (!Array.isArray(cartdata) || cartdata.length === 0) {
       return "0.00"; // ✅ When cart is empty, return "0.00"
     }
 
-    return context.cartdata
+    return cartdata
       .reduce((total, item) => total + (item.subTotal || 0), 0)
       .toFixed(2);
   };
@@ -86,12 +86,12 @@ const Header = () => {
                 </Link>
               </div>
               <div className="col-sm-10 d-flex align-items-center part2">
-                {context.countrList.length !== 0 && <CountryDropdown />}
+                {countrList.length !== 0 && <CountryDropdown />}
 
                 <SearchBox />
 
                 <div className="part3 d-flex align-items-center ml-6 mr-2">
-                  {/* {context.isLogin !== true ? (
+                  {/* {isLogin !== true ? (
                     <Link to="/SignIn">
                       <Button className="btn-blue btn-round ml-4 mr-2">
                         Sign In
@@ -103,7 +103,7 @@ const Header = () => {
                     </Button>
                   )} */}
 
-                  {context.isLogin ? (
+                  {isLogin ? (
                     <div className="myAccWrapper" style={{ marginRight: 20 }}>
                       <Button
                         className="myAcc d-flex align-items-center"
@@ -111,12 +111,12 @@ const Header = () => {
                       >
                         <div className="userImg">
                           <span className="rounded-circle">
-                            {context.user?.name?.charAt(0)}
+                            {user?.name?.charAt(0)}
                           </span>
                         </div>
                         <div className="userInfo res-hide">
-                          <h6>{context.user?.name}</h6>
-                          <p className="mb-0">{context.user?.email}</p>
+                          <h6>{user?.name}</h6>
+                          <p className="mb-0">{user?.email}</p>
                         </div>
                       </Button>
                       <Menu
@@ -198,7 +198,7 @@ const Header = () => {
                         </Button>
                       </Link>
                       <span className="count  d-flex align-items-center justify-content-center">
-                        {context.cartdata?.length || 0}
+                        {cartdata?.length || 0}
                       </span>
                     </div>
                   </div>

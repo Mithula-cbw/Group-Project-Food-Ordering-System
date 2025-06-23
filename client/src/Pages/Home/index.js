@@ -11,7 +11,7 @@ import HomeCat from "../../Components/HomeCat";
 import newsBanner from "../../assets/images/coupon.png";
 import { IoMailOutline } from "react-icons/io5";
 import { fetchDataFromApi } from "../../utils/Api";
-import { Mycontext } from "../../App";
+import { Mycontext } from "../../context/MyContext";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
