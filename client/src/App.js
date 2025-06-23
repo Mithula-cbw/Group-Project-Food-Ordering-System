@@ -217,7 +217,7 @@ function App() {
           <Route path="/payment/complete" element={<PaymentSuccess />} />
           {/* <Route path="/contact" element={<Contact />} /> */}
           {/* <Route path="/contact" element={<Contact />} /> */}
-          <Route path="/contact" element={<Contact />} />
+          <Route path="/contact" element={<MainLayout><Contact /></MainLayout>} />
         </Routes>
 
         {/* {isHeaderFooterShow && <Footer />} */}

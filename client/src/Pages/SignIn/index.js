@@ -241,7 +241,7 @@ const SignIn = () => {
                   <Button
                     className="btn-lg btn-big col ml-2"
                     variant="outlined"
-                    onClick={() => context.setIsHeaderFooterShow(true)}
+                    // onClick={() => context.setIsHeaderFooterShow(true)}
                   >
                     Cancel
                   </Button>

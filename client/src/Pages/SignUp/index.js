@@ -213,7 +213,7 @@ const SignUp = () => {
                         <Button
                           className="btn-lg btn-big w-100 "
                           variant="outlined"
-                          onClick={() => context.setIsHeaderFooterShow(true)}
+                          // onClick={() => context.setIsHeaderFooterShow(true)}
                         >
                           Cancel
                         </Button>
