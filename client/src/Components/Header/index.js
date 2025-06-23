@@ -66,6 +66,11 @@ const Header = () => {
   if (!user || !mylistdata) return 0;
   return mylistdata.filter((item) => item.userId === user._id).length;
 }, [user, mylistdata]);
+
+const myCartCount = useMemo(() => {
+  return cartdata?.length || 0;
+}, [user, cartdata]);
+
   
   useEffect(() => {
   fetchDataFromApi("/api/myList/").then((res) => {
@@ -198,7 +203,7 @@ const Header = () => {
                         </Button>
                       </Link>
                       <span className="count  d-flex align-items-center justify-content-center">
-                        {cartdata?.length || 0}
+                        {myCartCount}
                       </span>
                     </div>
                   </div>
