@@ -8,7 +8,7 @@ import { BsCart3 } from "react-icons/bs";
 import SearchBox from "./SearchBox";
 import Avatar from "@mui/material/Avatar";
 import Navigation from "./Navigation";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useMemo } from "react";
 import { Mycontext } from "../../context/MyContext";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -21,7 +21,7 @@ import { fetchDataFromApi } from "../../utils/Api";
 import { AiOutlineHeart } from "react-icons/ai";
 
 const Header = () => {
-  const [mylistdata, setmylistdata] = useState();
+  const [mylistdata, setmylistdata] = useState([]);
   const [accountAnchorEl, setAccountAnchorEl] = useState(null);
   const { cartdata, isLogin, user, countrList } = useContext(Mycontext);
   const navigate = useNavigate();
@@ -61,11 +61,18 @@ const Header = () => {
       .reduce((total, item) => total + (item.subTotal || 0), 0)
       .toFixed(2);
   };
+
+ const myListCount = useMemo(() => {
+  if (!user || !mylistdata) return 0;
+  return mylistdata.filter((item) => item.userId === user._id).length;
+}, [user, mylistdata]);
+  
   useEffect(() => {
-    fetchDataFromApi("/api/myList/").then((res) => {
-      setmylistdata(res);
-    });
-  }, [mylistdata]);
+  fetchDataFromApi("/api/myList/").then((res) => {
+    setmylistdata(res);
+  });
+}, []); // ✅ run only once on mount
+
   return (
     <>
       <div className="headerWrapper">
@@ -177,14 +184,7 @@ const Header = () => {
                         </Button>
                       </Link>
                       <span className="count d-flex align-items-center justify-content-center">
-                        {(() => {
-                          const user = JSON.parse(localStorage.getItem("user")); // Get user from localStorage
-                          return user
-                            ? mylistdata?.filter(
-                                (item) => item.userId === user._id
-                              ).length || 0
-                            : 0;
-                        })()}
+                        {myListCount}
                       </span>
                     </div>
                   </div>
