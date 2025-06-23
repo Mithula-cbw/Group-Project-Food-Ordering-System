@@ -24,9 +24,9 @@ const SignIn = () => {
       [e.target.name]: e.target.value,
     }));
   };
-  useEffect(() => {
-    context.setIsHeaderFooterShow(false);
-  }, []);
+  // useEffect(() => {
+  //   context.setIsHeaderFooterShow(false);
+  // }, []);
   const [formFields, setFormFields] = useState({
     email: "",
     password: "",

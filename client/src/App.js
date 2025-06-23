@@ -21,6 +21,8 @@ import "react-toastify/dist/ReactToastify.css";
 import MyList from "./Pages/MyList";
 import PaymentSuccess from "./Pages/paymentSuccess";
 import Contact from "./Pages/Contact/contact";
+import AuthLayout from './layouts/AuthLayout/AuthLayout';
+import MainLayout from './layouts/MainLayout/MainLayout';
 // import Contact from "./Pages/contact";
 
 const Mycontext = createContext();
@@ -32,7 +34,7 @@ function App() {
     id: "",
     open: false,
   });
-  const [isHeaderFooterShow, setIsHeaderFooterShow] = useState(true);
+  // const [isHeaderFooterShow, setIsHeaderFooterShow] = useState(true);
   const [isLogin, setisLogin] = useState(false);
   const [productData, setProductData] = useState(null);
   const [categoryData, setCategoryData] = useState([]);
@@ -183,8 +185,6 @@ function App() {
     selectCity,
     isOpenProductModel,
     setisOpenProductModel,
-    isHeaderFooterShow,
-    setIsHeaderFooterShow,
     isLogin,
     setisLogin,
     categoryData,
@@ -203,24 +203,24 @@ function App() {
     <BrowserRouter>
       <ToastContainer position="bottom-right" autoClose={3000} />
       <Mycontext.Provider value={values}>
-        {isHeaderFooterShow && <Header />}
+        {/* {isHeaderFooterShow && <Header />} */}
 
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/cat/:id" element={<Listing />} />
-          <Route path="/product/:id" element={<ProductDetails />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/signIn" element={<SignIn />} />
-          <Route path="/signUp" element={<SignUp />} />
-          <Route path="/blog" element={<BlogPage />} />
-          <Route path="/myList" element={<MyList />} />
+          <Route path="/" element={<MainLayout><Home /></MainLayout>} />
+          <Route path="/cat/:id" element={<MainLayout><Listing /></MainLayout>} />
+          <Route path="/product/:id" element={<MainLayout><ProductDetails /></MainLayout>} />
+          <Route path="/cart" element={<MainLayout><Cart /></MainLayout>} />
+          <Route path="/signIn" element={<AuthLayout><SignIn /></AuthLayout>} />
+          <Route path="/signUp" element={<AuthLayout><SignUp /></AuthLayout>} />
+          <Route path="/blog" element={<MainLayout><BlogPage /></MainLayout>} />
+          <Route path="/myList" element={<MainLayout><MyList /></MainLayout>} />
           <Route path="/payment/complete" element={<PaymentSuccess />} />
           {/* <Route path="/contact" element={<Contact />} /> */}
           {/* <Route path="/contact" element={<Contact />} /> */}
           <Route path="/contact" element={<Contact />} />
         </Routes>
 
-        {isHeaderFooterShow && <Footer />}
+        {/* {isHeaderFooterShow && <Footer />} */}
 
         {/* ✅ Show modal only when it's open */}
         {isOpenProductModel.open && (

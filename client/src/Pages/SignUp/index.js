@@ -13,9 +13,9 @@ import { ClipLoader } from "react-spinners"; // Importing ClipLoader spinner
 const SignUp = () => {
   const [loading, setLoading] = useState(false); // Loading state
   const context = useContext(Mycontext);
-  useEffect(() => {
-    context.setIsHeaderFooterShow(false);
-  }, []);
+  // useEffect(() => {
+  //   context.setIsHeaderFooterShow(false);
+  // }, []);
   const [formFields, setFormFields] = useState({
     name: "",
     phone: "",
