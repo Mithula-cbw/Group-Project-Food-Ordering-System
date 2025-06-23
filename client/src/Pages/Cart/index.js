@@ -13,17 +13,17 @@ import { loadStripe } from "@stripe/stripe-js";
 const Cart = () => {
   const [activeSize, setActiveSize] = useState(null);
   const [cartFields, setCartFields] = useState({});
-  const [cartData, setCartData] = useState([]);
+  const [cartDataS, setCartDataS] = useState([]);
   const [loading, setLoaing] = useState(false);
-  const context = useContext(Mycontext);
+  const { cartdata} = useContext(Mycontext);
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
     fetchDataFromApi(`/api/cart?userId=${user?._id}`).then((res) => {
-      setCartData(res);
+      setCartDataS(res);
     });
   }, []);
   const updateQuantity = (productId, newQuantity) => {
-    setCartData((prevCart) =>
+    setCartDataS((prevCart) =>
       prevCart.map((item) =>
         item._id === productId
           ? {
@@ -36,7 +36,7 @@ const Cart = () => {
     );
 
     // Find the updated item and call selectedItem
-    const updatedItem = cartData.find((item) => item._id === productId);
+    const updatedItem = cartDataS.find((item) => item._id === productId);
     if (updatedItem) {
       selectedItem({ ...updatedItem, quantity: newQuantity });
     }
@@ -51,12 +51,12 @@ const Cart = () => {
         toast.success("Item removed from cart successfully!");
 
         // ✅ Update cart optimistically
-        setCartData((prevCart) => prevCart.filter((item) => item._id !== id));
+        setCartDataS((prevCart) => prevCart.filter((item) => item._id !== id));
 
         // ✅ Fetch new data after a delay
         setTimeout(() => {
           fetchDataFromApi(`/api/cart`).then((res) => {
-            setCartData(res);
+            setCartDataS(res);
             setLoaing(false);
           });
         }, 1000);
@@ -110,12 +110,12 @@ const Cart = () => {
         setLoaing(false);
 
         // Fetch updated cart data from API
-        fetchDataFromApi(`/api/cart`).then((cartData) => {
+        fetchDataFromApi(`/api/cart`).then((cartDataS) => {
           // Save the cart data in localStorage
-          localStorage.setItem("cart", JSON.stringify(cartData));
+          localStorage.setItem("cart", JSON.stringify(cartDataS));
 
           // Update the state with the new cart data
-          setCartData(cartData);
+          setCartDataS(cartDataS);
         });
       }, 1000);
     });
@@ -127,18 +127,18 @@ const Cart = () => {
 
     if (!user) {
       localStorage.removeItem("cart");
-      setCartData([]); // ✅ Clear state properly
+      setCartDataS([]); // ✅ Clear state properly
       return;
     }
 
     const savedCart = JSON.parse(localStorage.getItem("cart"));
 
     if (savedCart && savedCart.length > 0) {
-      setCartData(savedCart);
+      setCartDataS(savedCart);
     } else {
-      fetchDataFromApi(`/api/cart?userId=${user?._id}`).then((cartData) => {
-        localStorage.setItem("cart", JSON.stringify(cartData));
-        setCartData(cartData);
+      fetchDataFromApi(`/api/cart?userId=${user?._id}`).then((cartDataS) => {
+        localStorage.setItem("cart", JSON.stringify(cartDataS));
+        setCartDataS(cartDataS);
       });
     }
   };
@@ -149,11 +149,11 @@ const Cart = () => {
   }, []);
 
   const calculateSubtotal = () => {
-    if (!Array.isArray(context.cartdata) || context.cartdata.length === 0) {
+    if (!Array.isArray(cartdata) || cartdata.length === 0) {
       return "0.00";
     }
 
-    return context.cartdata
+    return cartdata
       .reduce((total, item) => total + (item.subTotal || 0), 0)
       .toFixed(2);
   };
@@ -167,7 +167,7 @@ const Cart = () => {
       return;
     }
 
-    const cartProducts = cartData.map((product) => ({
+    const cartProducts = cartDataS.map((product) => ({
       productTitle: product?.productTitle,
       images: product?.images,
       price: parseFloat((product?.subTotal / product?.quantity).toFixed(2)),
@@ -231,7 +231,7 @@ const Cart = () => {
         <div className="container">
           <h2 className="hd mb-0 ml-5">Your Cart</h2>
           <p className=" ml-5">
-            There are <b className="text-red">{cartData?.length}</b> products in
+            There are <b className="text-red">{cartDataS?.length}</b> products in
             your cart
           </p>
           <div className="row">
@@ -248,8 +248,8 @@ const Cart = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {cartData?.length > 0 ? (
-                      cartData.map((item, index) => (
+                    {cartDataS?.length > 0 ? (
+                      cartDataS.map((item, index) => (
                         <tr key={index}>
                           <td>
                             <Link to={`/product/${item?.productId}`}>

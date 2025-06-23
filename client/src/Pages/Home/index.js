@@ -36,7 +36,6 @@ const Home = (props) => {
     }
   };
   // Handle tab changes
-  const context = useContext(Mycontext);
   const [catData, setCatdata] = useState([]);
   const [featuredProducts, setfeaturedProducts] = useState([]);
   const [mealsProducts, setmealsProducts] = useState([]);
