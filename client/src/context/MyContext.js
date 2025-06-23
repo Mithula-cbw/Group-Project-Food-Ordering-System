@@ -14,7 +14,7 @@ const MyProvider = ({ children }) => {
   const [categoryData, setCategoryData] = useState([]);
   const [cartData, setCartData] = useState([]);
   const [addingCart, setaddingCart] = useState(false);
-  const [user, setUser] = useState({ name: "", email: "", userId: "" });
+  const [user, setUser] = useState({ name: "", email: "", Id: "" });
   const [cartdata, setcartdata] = useState();
 
   useEffect(() => {

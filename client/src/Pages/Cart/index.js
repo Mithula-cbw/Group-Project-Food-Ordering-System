@@ -15,6 +15,7 @@ const Cart = () => {
   const [cartFields, setCartFields] = useState({});
   const [cartDataS, setCartDataS] = useState([]);
   const [loading, setLoaing] = useState(false);
+  const [subtotal, setSubtotal] = useState("0.00");
   const { cartdata} = useContext(Mycontext);
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -148,15 +149,22 @@ const Cart = () => {
     loadCart();
   }, []);
 
-  const calculateSubtotal = () => {
-    if (!Array.isArray(cartdata) || cartdata.length === 0) {
-      return "0.00";
-    }
+  useEffect(() => {
+  const newSubtotal = calculateSubtotal();
+  setSubtotal(newSubtotal);
+}, [cartDataS]); // make sure cartDataS is the correct cart state
 
-    return cartdata
-      .reduce((total, item) => total + (item.subTotal || 0), 0)
-      .toFixed(2);
-  };
+
+ const calculateSubtotal = () => {
+  if (!Array.isArray(cartDataS) || cartDataS.length === 0) {
+    return "0.00";
+  }
+
+  return cartDataS
+    .reduce((total, item) => total + (item.subTotal || 0), 0)
+    .toFixed(2);
+};
+
 
   const checkout = async () => {
     console.log("Checkout function triggered!"); // Debugging
@@ -333,14 +341,14 @@ const Cart = () => {
                 <div className="d-flex justify-content-between align-items-center mb-3">
                   <span>SubTotal</span>
                   <span className="amount text-success">
-                    ${calculateSubtotal()}
+                    ${subtotal}
                   </span>
                 </div>
 
                 <div className="d-flex justify-content-between align-items-center mb-3">
                   <span>Shipping</span>
                   <span className="text-muted font-weight-bold">
-                    {calculateSubtotal() > 500 ? "Free" : `$${20}`}
+                    {subtotal > 500 ? "Free" : `$${20}`}
                   </span>
                 </div>
 
@@ -353,8 +361,8 @@ const Cart = () => {
                   <span>Total</span>
                   <span className="amount text-danger font-weight-bold">
                     $
-                    {Number(calculateSubtotal()) +
-                      Number(calculateSubtotal() > 500 ? 0 : 20)}
+                    {Number(subtotal) +
+                      Number(subtotal > 500 ? 0 : 20)}
                     .00
                   </span>
                 </div>
