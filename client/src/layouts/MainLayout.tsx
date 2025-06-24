@@ -1,14 +1,20 @@
-import { Link, Outlet } from "react-router-dom";
+import React from "react";
+// import Header from "../../Components/Header";
+// import Footer from "../../Components/Footer";
 
-export default function MainLayout() {
+type MainLayoutProps = {
+  children : React.ReactNode;
+};
+
+
+const MainLayout : React.FC<MainLayoutProps> = ({ children }) => {
   return (
-    <div className="p-4 bg-red-50">
-      <nav className="space-x-4">
-        <Link to="/">Home</Link>
-        <Link to="/about">About</Link>
-      </nav>
-      <hr className="my-4" />
-      <Outlet />
+    <div className="flex flex-col min-h-screen bg-white">
+      {/* <Header /> */}
+      <main className="flex-1">{children}</main>
+      {/* <Footer /> */}
     </div>
   );
-}
+};
+
+export default MainLayout;
